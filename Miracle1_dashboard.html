@@ -208,6 +208,7 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
 .hint{font-size:11.5px;color:var(--text-3)}
 .btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
 .dlg-f{display:flex;gap:8px;justify-content:flex-end;padding:14px 20px;border-top:1px solid var(--border)}
+.updbar{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 10px 10px 16px;box-shadow:0 8px 30px rgba(0,0,0,.18);font-size:13px;white-space:nowrap}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:13px;opacity:0;transition:.2s;z-index:50;pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%)}
 </style>
@@ -389,9 +390,11 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
   </div>
 </dialog>
 
+<div class="updbar" id="updBar" hidden><span>새 버전이 나왔어요</span><button class="btn sm primary" id="updBtn">새로고침</button></div>
 <div class="toast" id="toast"></div>
 
 <script>
+const BUILD = '20260929222202'; // 게시할 때 publish.sh가 시각으로 바꿈
 /* ---------- 유틸 ---------- */
 const $ = s => document.querySelector(s);
 const DAY = 86400000;
@@ -1112,6 +1115,25 @@ $('#syncOffBtn').onclick = () => { if (!confirm('이 기기의 동기화 연결�
 $('#syncChip').onclick = () => { openSettings(); setTimeout(() => $('#syncSec').scrollIntoView({ block: 'start' }), 50); };
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') syncNow(); });
 setInterval(() => { if (document.visibilityState === 'visible') syncNow(); }, 30000);
+
+/* ---------- 새 버전 자동 적용 (GitHub Pages) ---------- */
+// 게시된 파일의 BUILD 값이 바뀌면, 입력 중인 내용이 없을 때 자동 새로고침
+function isDirty() {
+  const r = S().records[$('#inDate').value], v = $('#inBal').value.trim();
+  return !!document.querySelector('dialog[open]') || !!$('#wdUsd').value.trim() || (v && (!r || num(v) !== r.bal)) || (document.activeElement && /INPUT|SELECT/.test(document.activeElement.tagName));
+}
+async function checkUpdate() {
+  if (!/^https?:/.test(location.protocol) || BUILD === 'dev') return;
+  try {
+    const txt = await (await fetch(location.pathname + '?_=' + Date.now(), { cache: 'no-store' })).text();
+    const b = (txt.match(/const BUILD = '20260929222202']+)'/) || [])[1];
+    if (!b || b === BUILD) return;
+    if (isDirty()) $('#updBar').hidden = false; else location.reload();
+  } catch (e) { }
+}
+$('#updBtn').onclick = () => location.reload();
+setInterval(() => { if (document.visibilityState === 'visible') checkUpdate(); }, 60000);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') checkUpdate(); });
 
 /* ---------- 기타 ---------- */
 let toastT;
