@@ -1,0 +1,1180 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Miracle of 1%</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Miracle 1%">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#f6f6f4; --surface:#ffffff; --surface-2:#f0efec; --border:#e4e3df;
+  --text:#0b0b0b; --text-2:#52514e; --text-3:#8a8984;
+  --accent:#2a78d6; --accent-soft:#e8f1fc; --guide:#9b9a94;
+  --up:#c8302f; --down:#1f64b8; --up-fill:#e34948; --down-fill:#2a78d6;
+  --good:#16794a; --good-soft:#e4f4ec; --warn-soft:#fdf1e2; --warn:#9a5b00;
+  --shadow:0 1px 2px rgba(0,0,0,.04),0 2px 10px rgba(0,0,0,.035);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#111110; --surface:#1a1a19; --surface-2:#242422; --border:#2f2f2c;
+    --text:#ffffff; --text-2:#c3c2b7; --text-3:#8d8c85;
+    --accent:#3987e5; --accent-soft:#1b2a3d; --guide:#7d7c76;
+    --up:#f07a79; --down:#6aa6ee; --up-fill:#e66767; --down-fill:#3987e5;
+    --good:#4cc38a; --good-soft:#15291f; --warn-soft:#2d2415; --warn:#e0a44a;
+    --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#111110; --surface:#1a1a19; --surface-2:#242422; --border:#2f2f2c;
+  --text:#ffffff; --text-2:#c3c2b7; --text-3:#8d8c85;
+  --accent:#3987e5; --accent-soft:#1b2a3d; --guide:#7d7c76;
+  --up:#f07a79; --down:#6aa6ee; --up-fill:#e66767; --down-fill:#3987e5;
+  --good:#4cc38a; --good-soft:#15291f; --warn-soft:#2d2415; --warn:#e0a44a;
+  --shadow:none;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font-family:"Pretendard Variable",Pretendard,-apple-system,"Segoe UI","Malgun Gothic",sans-serif;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.num{font-variant-numeric:tabular-nums}
+button,input,select{font:inherit;color:inherit}
+.wrap{max-width:1200px;margin:0 auto;padding:0 16px 64px;overflow-x:clip}
+.card,.kpi{min-width:0}
+
+/* header */
+header{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.hdr{max-width:1200px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto}
+.brand h1{font-size:16px;margin:0;font-weight:700;letter-spacing:-.01em}
+.brand select{border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:4px 8px;font-weight:600}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{display:flex;align-items:baseline;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:4px 12px;font-size:13px;white-space:nowrap}
+.chip b{font-weight:650}
+.chip .lbl{color:var(--text-3);font-size:12px}
+.chip.manual{border-style:dashed}
+.iconbtn{border:1px solid var(--border);background:var(--surface);border-radius:8px;width:34px;height:34px;display:grid;place-items:center;cursor:pointer;color:var(--text-2)}
+.iconbtn:hover{color:var(--text);border-color:var(--text-3)}
+.iconbtn svg{width:18px;height:18px}
+.spin svg{animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.stamp{font-size:12px;color:var(--text-3)}
+.hbtns{display:flex;gap:6px}
+button.chip{cursor:pointer;font:inherit;font-size:12.5px;color:var(--text-2);align-items:center}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--text-3);display:inline-block}
+.dot.ok{background:var(--good)} .dot.err{background:var(--up)} .dot.busy{background:var(--accent);animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.3}}
+.steps{margin:6px 0 0;padding-left:18px;font-size:12.5px;color:var(--text-2);display:grid;gap:3px}
+.steps a,#syncInfo a{color:var(--accent)}
+.hbtn{display:flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--surface);border-radius:8px;height:34px;padding:0 12px;cursor:pointer;font-weight:600;font-size:13px;color:var(--text)}
+.hbtn:hover{border-color:var(--text-3)}
+.hbtn svg{width:16px;height:16px;color:var(--accent)}
+.hbtn .cnt{font-size:11px;font-weight:600;color:var(--text-2);background:var(--surface-2);border-radius:99px;padding:0 6px}
+.hbtn .cnt:empty{display:none}
+dialog.wide{width:min(1280px,calc(100vw - 24px));max-width:none;height:calc(100vh - 24px);max-height:none;flex-direction:column}
+dialog.wide[open]{display:flex}
+dialog.wide .dlg-b{flex:1;min-height:0;max-height:none;display:flex;flex-direction:column;overflow:hidden;padding-bottom:16px}
+dialog.wide .tblwrap{flex:1;min-height:0;max-height:none!important}
+dialog.wide table{font-size:13.5px}
+@media (max-height:700px){dialog.wide .dlg-b{overflow:auto}dialog.wide .tblwrap{flex:none;height:70vh}}
+.sumgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:16px 0}
+@media (max-width:700px){.sumgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.sum{background:var(--surface-2);border-radius:12px;padding:12px 14px;min-width:0}
+.sum .k{font-size:12px;color:var(--text-2)}
+.sum .v{font-size:19px;font-weight:700;letter-spacing:-.01em;margin-top:2px;overflow-wrap:anywhere}
+.sum .s{font-size:12px;color:var(--text-2)}
+.sum.hero{background:var(--accent-soft)}
+.sum.hero .v{color:var(--accent)}
+.miles{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.mile{border:1px solid var(--border);border-radius:99px;padding:4px 12px;font-size:12.5px;color:var(--text-2)}
+.mile b{color:var(--text)}
+.mile.done{border-color:var(--good);color:var(--good)}
+.ok{color:var(--good);font-weight:600}.ng{color:var(--warn);font-weight:600}
+.wdform{display:grid;grid-template-columns:140px 1fr 1fr 1.2fr auto;gap:8px;align-items:end;margin-top:14px}
+@media (max-width:760px){.wdform{grid-template-columns:1fr 1fr}}
+.wdform label{font-size:12px;color:var(--text-2);display:flex;flex-direction:column;gap:4px}
+.wdform input{border:1px solid var(--border);border-radius:8px;padding:8px 10px;background:var(--surface);outline:0;min-width:0}
+.wdform input:focus{border-color:var(--accent)}
+tr.editing td{background:var(--accent-soft)!important}
+
+/* layout */
+.grid-top{display:grid;grid-template-columns:340px minmax(0,1fr);gap:16px;margin-top:20px}
+@media (max-width:900px){.grid-top{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:18px}
+.card h2{font-size:14px;margin:0 0 12px;font-weight:650;display:flex;align-items:center;gap:8px}
+.card h2 .sub{font-weight:400;color:var(--text-3);font-size:12px;margin-left:auto}
+section{margin-top:16px}
+
+/* entry */
+.entry label{display:block;font-size:12px;color:var(--text-2);margin:10px 0 4px}
+.field{display:flex;align-items:center;border:1px solid var(--border);border-radius:10px;background:var(--surface);padding:0 12px;transition:border-color .15s}
+.field:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.field input{border:0;outline:0;background:transparent;padding:10px 0;width:100%;min-width:0}
+.field .pre{color:var(--text-3);margin-right:6px}
+.field.big input{font-size:22px;font-weight:650}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.preview{margin-top:12px;background:var(--surface-2);border-radius:10px;padding:10px 12px;font-size:13px;display:grid;gap:4px;min-height:44px}
+.preview div{display:flex;justify-content:space-between;gap:8px}
+.preview span:first-child{color:var(--text-2)}
+.btn{border:0;border-radius:10px;padding:10px 14px;font-weight:600;cursor:pointer;background:var(--surface-2);color:var(--text)}
+.btn:hover{filter:brightness(.97)}
+.btn.primary{background:var(--accent);color:#fff}
+.btn.danger{background:transparent;color:var(--up);border:1px solid var(--border)}
+.btn.block{width:100%;margin-top:12px}
+.btn.sm{padding:6px 10px;font-size:13px;border-radius:8px}
+.linkbtn{background:none;border:0;color:var(--accent);cursor:pointer;padding:0;font-size:12px}
+.entry .status{font-size:12px;color:var(--text-3);margin-top:8px;text-align:center;min-height:18px}
+.toggle-flow{margin-top:10px}
+
+/* KPIs */
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:1100px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.kpis{grid-template-columns:minmax(0,1fr)}}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:2px;min-width:0}
+.kpi .k{font-size:12px;color:var(--text-2);display:flex;justify-content:space-between;gap:6px}
+.kpi .v{font-size:24px;font-weight:700;letter-spacing:-.02em;line-height:1.25;overflow-wrap:anywhere}
+.kpi .s{font-size:12.5px;color:var(--text-2)}
+.bar{height:6px;background:var(--surface-2);border-radius:99px;overflow:hidden;margin:8px 0 4px}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:99px}
+.up{color:var(--up)} .down{color:var(--down)} .muted{color:var(--text-3)}
+.badge{font-size:11px;font-weight:600;padding:1px 7px;border-radius:99px;background:var(--surface-2);color:var(--text-2)}
+.badge.good{background:var(--good-soft);color:var(--good)}
+.badge.warn{background:var(--warn-soft);color:var(--warn)}
+
+/* charts */
+.chart-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.chart-head h2{margin:0}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--text-2)}
+.legend span{display:flex;align-items:center;gap:6px}
+.sw{width:14px;height:0;border-top:2px solid}
+.sw.dash{border-top-style:dashed}
+.sq{width:10px;height:10px;border-radius:2px}
+.seg{display:inline-flex;background:var(--surface-2);border-radius:8px;padding:2px;margin-left:auto}
+.seg button{border:0;background:transparent;padding:4px 10px;border-radius:6px;font-size:12px;cursor:pointer;color:var(--text-2)}
+.seg button.on{background:var(--surface);color:var(--text);font-weight:600;box-shadow:var(--shadow)}
+.chk{font-size:12px;color:var(--text-2);display:flex;align-items:center;gap:4px;cursor:pointer}
+.chart{position:relative;width:100%}
+.chart svg{display:block;width:100%;overflow:visible}
+.chart .axis text{fill:var(--text-3);font-size:11px}
+.chart .grid line{stroke:var(--border)}
+.tip{position:absolute;pointer-events:none;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px 10px;font-size:12px;box-shadow:0 4px 18px rgba(0,0,0,.12);min-width:150px;opacity:0;transition:opacity .08s;z-index:5}
+.tip .t{font-weight:650;margin-bottom:4px}
+.tip div.r{display:flex;justify-content:space-between;gap:12px}
+.tip div.r span:first-child{color:var(--text-2);display:flex;align-items:center;gap:6px}
+.empty{padding:36px 0;text-align:center;color:var(--text-3);font-size:13px}
+.grid-2{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:16px}
+@media (max-width:900px){.grid-2{grid-template-columns:minmax(0,1fr)}}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1px;background:var(--border);border-radius:10px;overflow:hidden;border:1px solid var(--border)}
+.stat{background:var(--surface);padding:12px 14px}
+.stat .k{font-size:12px;color:var(--text-2)}
+.stat .v{font-size:17px;font-weight:650;margin-top:2px}
+.stat .s{font-size:11.5px;color:var(--text-3)}
+
+/* tables */
+.tblwrap{overflow:auto;max-height:560px;border:1px solid var(--border);border-radius:10px}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:13px}
+th,td{padding:8px 10px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--border)}
+th{position:sticky;top:0;background:var(--surface-2);font-weight:600;color:var(--text-2);font-size:12px;z-index:1}
+th:first-child,td:first-child,th:nth-child(2),td:nth-child(2){text-align:left}
+tbody tr:hover td{background:var(--surface-2)}
+tr.today td{background:var(--accent-soft)!important}
+tr.future td{color:var(--text-3)}
+tr.rec{cursor:pointer}
+td .note{color:var(--text-3);font-size:12px;margin-left:6px}
+td.act{width:28px;padding:0 6px}
+.del{border:0;background:none;color:var(--text-3);cursor:pointer;font-size:15px;line-height:1;padding:4px;border-radius:6px;opacity:0}
+tr:hover .del{opacity:1}
+.del:hover{color:var(--up);background:var(--surface)}
+
+/* dialog */
+dialog{border:1px solid var(--border);border-radius:16px;background:var(--surface);color:var(--text);padding:0;width:min(560px,calc(100vw - 32px));box-shadow:0 20px 60px rgba(0,0,0,.25)}
+dialog::backdrop{background:rgba(0,0,0,.35)}
+.dlg-h{display:flex;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border)}
+.dlg-h h3{margin:0;font-size:16px}
+.dlg-b{padding:4px 20px 20px;max-height:70vh;overflow:auto}
+.dlg-b h4{font-size:12px;color:var(--text-3);text-transform:uppercase;letter-spacing:.04em;margin:18px 0 8px;font-weight:600}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form label{font-size:12px;color:var(--text-2);display:flex;flex-direction:column;gap:4px}
+.form label.full{grid-column:1/-1}
+.form input,.form select{border:1px solid var(--border);border-radius:8px;padding:8px 10px;background:var(--surface);outline:0}
+.form input:focus,.form select:focus{border-color:var(--accent)}
+.hint{font-size:11.5px;color:var(--text-3)}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.dlg-f{display:flex;gap:8px;justify-content:flex-end;padding:14px 20px;border-top:1px solid var(--border)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:13px;opacity:0;transition:.2s;z-index:50;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%)}
+</style>
+</head>
+<body>
+<header>
+  <div class="hdr">
+    <div class="brand">
+      <h1>Miracle of 1%</h1>
+      <select id="seasonSel" aria-label="시즌 선택"></select>
+      <div class="hbtns">
+        <button class="hbtn" id="guideBtn" title="가이드대로 매일 얼마씩 벌어야 하는지"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>가이드</button>
+        <button class="hbtn" id="wdBtn" title="출금 내역"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 10v4M10 12l2 2 2-2"/></svg>출금<span class="cnt" id="wdCnt"></span></button>
+      </div>
+    </div>
+    <div class="chips" id="chips"></div>
+    <button class="chip" id="syncChip" hidden></button>
+    <span class="stamp" id="stamp"></span>
+    <button class="iconbtn" id="refreshBtn" title="환율·김프 새로고침"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></button>
+    <button class="iconbtn" id="themeBtn" title="테마"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg></button>
+    <button class="iconbtn" id="settingsBtn" title="설정"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="grid-top">
+    <!-- 입력 -->
+    <div class="card entry">
+      <h2>실적 입력 <span class="sub" id="entryDay"></span></h2>
+      <label for="inDate">날짜</label>
+      <div class="field"><input type="date" id="inDate"></div>
+      <label for="inBal">잔고 (USD)</label>
+      <div class="field big"><span class="pre">$</span><input id="inBal" inputmode="decimal" placeholder="0" autocomplete="off"></div>
+      <div id="flowBox" hidden>
+        <div class="row2">
+          <div><label for="inFlow">추가 입금 (USD)</label><div class="field"><input id="inFlow" inputmode="decimal" placeholder="0"></div></div>
+          <div><label for="inNote">메모</label><div class="field"><input id="inNote" placeholder="예: 빚상환"></div></div>
+        </div>
+      </div>
+      <div class="toggle-flow"><button class="linkbtn" id="flowToggle">+ 입금·메모 추가 <span class="muted">(출금은 상단 ‘출금’ 버튼)</span></button></div>
+      <div class="preview num" id="preview"></div>
+      <button class="btn primary block" id="saveBtn">저장</button>
+      <div class="status" id="entryStatus"></div>
+    </div>
+
+    <!-- KPI -->
+    <div class="kpis" id="kpis"></div>
+  </div>
+
+  <section class="card">
+    <div class="chart-head">
+      <h2>잔고 추이</h2>
+      <div class="legend"><span><i class="sw" style="border-color:var(--accent)"></i>실적</span><span><i class="sw dash" style="border-color:var(--guide)"></i>목표 가이드</span></div>
+      <div class="seg" id="rangeSeg">
+        <button data-r="30">30일</button><button data-r="90">90일</button><button data-r="rec" class="on">진행 구간</button><button data-r="plan">전체 플랜</button>
+      </div>
+      <label class="chk"><input type="checkbox" id="logChk"> 로그 스케일</label>
+    </div>
+    <div class="chart" id="balChart"></div>
+  </section>
+
+  <div class="grid-2">
+    <section class="card">
+      <div class="chart-head">
+        <h2>일별 수익률</h2>
+        <div class="legend"><span><i class="sq" style="background:var(--up-fill)"></i>상승</span><span><i class="sq" style="background:var(--down-fill)"></i>하락</span><span><i class="sw dash" style="border-color:var(--guide)"></i>목표율</span></div>
+      </div>
+      <div class="chart" id="retChart"></div>
+    </section>
+    <section class="card">
+      <h2>성과 통계</h2>
+      <div class="stats num" id="stats"></div>
+    </section>
+  </div>
+
+  <section class="card">
+    <h2>월별 요약</h2>
+    <div class="tblwrap" id="monthly"></div>
+  </section>
+
+  <section class="card">
+    <div class="chart-head">
+      <h2>일자별 기록</h2>
+      <span class="stamp">행을 누르면 해당 날짜를 수정할 수 있어요</span>
+      <div class="seg" id="ledgerSeg"><button data-m="rec" class="on">기록한 날</button><button data-m="all">전체 일정</button></div>
+    </div>
+    <div class="tblwrap" id="ledger"></div>
+  </section>
+</div>
+
+<!-- 설정 -->
+<dialog id="settings">
+  <div class="dlg-h"><h3>설정</h3><button class="iconbtn" style="margin-left:auto" onclick="settings.close()" title="닫기">✕</button></div>
+  <div class="dlg-b">
+    <h4>시즌 (회차)</h4>
+    <div class="form">
+      <label>이름<input id="sName"></label>
+      <label>시작일 (1일차)<input type="date" id="sStart"></label>
+      <label>원금 (USD)<input id="sPrincipal" inputmode="decimal"></label>
+      <label>일 목표수익률 (%)<input id="sRate" inputmode="decimal"></label>
+      <label>플랜 일수 (졸업일)<input id="sDays" inputmode="numeric"></label>
+      <label>졸업 목표금액 (원)<input id="sGoal" inputmode="numeric"><span class="hint" id="sGoalHint"></span></label>
+    </div>
+    <div class="btnrow"><button class="btn sm" id="newSeasonBtn">+ 새 시즌 만들기</button><button class="btn sm danger" id="delSeasonBtn">이 시즌 삭제</button></div>
+
+    <h4>환율 · 김프</h4>
+    <div class="form">
+      <label>김프 기준
+        <select id="kSrc"><option value="xrp">리플(XRP) 김프 — 업비트 XRP / 바이낸스 XRP</option><option value="usdt">테더(USDT) 프리미엄 — 업비트 USDT / 환율</option><option value="btc">비트코인 김프 — 업비트 BTC / 바이낸스 BTC</option></select>
+      </label>
+      <label>&nbsp;<span class="hint" style="padding-top:8px">리플로 이체해 원화로 바꾸는 경우 리플 김프가 실제 환전 비율이에요. 이체 수단에 맞춰 고르세요.</span></label>
+      <label>환율 수동 고정 (비우면 자동)<input id="fxMan" inputmode="decimal" placeholder="자동"></label>
+      <label>김프 수동 고정 % (비우면 자동)<input id="kMan" inputmode="decimal" placeholder="자동"></label>
+    </div>
+
+    <h4 id="syncSec">PC·폰 동기화 (GitHub)</h4>
+    <div id="syncOff">
+      <ol class="steps">
+        <li><a href="https://github.com/settings/tokens/new?scopes=gist&description=Miracle1%20sync" target="_blank" rel="noopener">GitHub 토큰 만들기</a>를 열고, Expiration을 <b>No expiration</b>으로 두고 <b>gist</b>만 체크된 상태로 Generate token</li>
+        <li>생성된 토큰(ghp_로 시작)을 복사해 아래에 붙여넣고 연결</li>
+        <li>다른 기기에서도 <b>같은 토큰</b>으로 연결하면 자동으로 같은 데이터를 씁니다</li>
+      </ol>
+      <div class="form" style="margin-top:10px">
+        <label class="full">GitHub 토큰<input id="syncToken" type="password" autocomplete="off" placeholder="ghp_..."></label>
+      </div>
+      <div class="btnrow"><button class="btn sm primary" id="syncConnect">연결</button></div>
+    </div>
+    <div id="syncOn" hidden>
+      <div class="hint" id="syncInfo" style="font-size:12.5px"></div>
+      <div class="btnrow"><button class="btn sm" id="syncNowBtn">지금 동기화</button><button class="btn sm danger" id="syncOffBtn">연결 해제</button></div>
+      <div class="hint" style="margin-top:6px">저장하면 바로 올라가고, 열려 있는 다른 기기는 30초 안에 반영돼요. 토큰은 이 기기에만 저장됩니다.</div>
+    </div>
+
+    <h4>데이터</h4>
+    <div class="hint">데이터는 이 브라우저에 저장됩니다. 다른 기기·브라우저로 옮기려면 백업 파일을 쓰세요.</div>
+    <div class="btnrow">
+      <button class="btn sm" id="xlsxBtn">엑셀에서 가져오기</button>
+      <button class="btn sm" id="exportBtn">백업 내보내기 (.json)</button>
+      <button class="btn sm" id="importBtn">백업 불러오기</button>
+      <input type="file" id="xlsxFile" accept=".xlsx,.xlsm,.xls" hidden>
+      <input type="file" id="jsonFile" accept=".json" hidden>
+    </div>
+    <div id="xlsxPanel" hidden style="margin-top:10px">
+      <div class="form">
+        <label class="full">가져올 시트<select id="xlsxSheet"></select></label>
+      </div>
+      <div class="preview" id="xlsxPreview"></div>
+      <div class="btnrow"><button class="btn sm primary" id="xlsxGo">이 시트로 시즌 만들기</button></div>
+    </div>
+  </div>
+  <div class="dlg-f"><button class="btn" onclick="settings.close()">취소</button><button class="btn primary" id="saveSettings">저장</button></div>
+</dialog>
+
+<!-- 가이드 플랜 -->
+<dialog id="guideDlg" class="wide">
+  <div class="dlg-h"><h3>가이드 플랜 <span class="muted" style="font-weight:400;font-size:13px" id="guideSub"></span></h3><button class="iconbtn" style="margin-left:auto" onclick="guideDlg.close()" title="닫기">✕</button></div>
+  <div class="dlg-b">
+    <div class="sumgrid num" id="guideSum"></div>
+    <div class="miles num" id="guideMiles"></div>
+    <div class="chart-head"><h2>일자별 목표 수익</h2><div class="seg" id="guideSeg"><button data-m="rest" class="on">오늘부터</button><button data-m="all">전체</button></div></div>
+    <div class="tblwrap" id="guideTbl"></div>
+  </div>
+</dialog>
+
+<!-- 출금 -->
+<dialog id="wdDlg" class="wide">
+  <div class="dlg-h"><h3>출금 내역</h3><button class="iconbtn" style="margin-left:auto" onclick="wdDlg.close()" title="닫기">✕</button></div>
+  <div class="dlg-b">
+    <div class="sumgrid num" id="wdSum"></div>
+    <div class="wdform">
+      <label>날짜<input type="date" id="wdDate"></label>
+      <label>출금액 (USD)<input id="wdUsd" inputmode="decimal" placeholder="0"></label>
+      <label>원화 수령액<input id="wdKrw" inputmode="numeric" placeholder="자동 계산"></label>
+      <label>메모<input id="wdNote" placeholder="예: 빚상환, 생활비"></label>
+      <div style="display:flex;gap:6px"><button class="btn primary" id="wdSave">추가</button><button class="btn" id="wdCancel" hidden>취소</button></div>
+    </div>
+    <div class="hint" style="margin:6px 0 14px">원화 수령액을 비워두면 현재 환율·김프로 계산해 저장해요. 출금은 수익률 계산에서 자동으로 빠집니다. 행을 누르면 수정할 수 있어요.</div>
+    <div class="tblwrap" id="wdTbl"></div>
+  </div>
+</dialog>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- 유틸 ---------- */
+const $ = s => document.querySelector(s);
+const DAY = 86400000;
+const pad = n => String(n).padStart(2, '0');
+const fmtD = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const parseD = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+const addD = (s, n) => { const d = parseD(s); d.setDate(d.getDate() + n); return fmtD(d); };
+const diffD = (a, b) => Math.round((parseD(b) - parseD(a)) / DAY);
+const todayS = () => fmtD(new Date());
+const md = s => { const d = parseD(s); return `${d.getMonth() + 1}/${d.getDate()}`; };
+const WD = ['일', '월', '화', '수', '목', '금', '토'];
+const longD = s => { const d = parseD(s); return `${d.getFullYear()}.${pad(d.getMonth() + 1)}.${pad(d.getDate())} (${WD[d.getDay()]})`; };
+const num = v => { if (v === '' || v == null) return NaN; return Number(String(v).replace(/[,\s$원]/g, '').replace('−', '-')); };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+const usd = (v, dec) => {
+  if (!isFinite(v)) return '—';
+  const a = Math.abs(v);
+  if (dec == null) dec = a >= 100000 ? 0 : 2;
+  return (v < 0 ? '-$' : '$') + a.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+};
+const usdShort = v => {
+  const a = Math.abs(v), s = v < 0 ? '-$' : '$';
+  if (a >= 1e9) return s + (a / 1e9).toFixed(2) + 'B';
+  if (a >= 1e6) return s + (a / 1e6).toFixed(2) + 'M';
+  if (a >= 1e4) return s + (a / 1e3).toFixed(1) + 'K';
+  return s + a.toLocaleString('en-US', { maximumFractionDigits: 0 });
+};
+const krw = v => isFinite(v) ? Math.round(v).toLocaleString('ko-KR') + '원' : '—';
+const krwShort = v => {
+  if (!isFinite(v)) return '—';
+  const a = Math.abs(v), s = v < 0 ? '-' : '';
+  if (a >= 1e12) return s + (a / 1e12).toFixed(2).replace(/\.?0+$/, '') + '조';
+  if (a >= 1e8) { const e = Math.floor(a / 1e8), m = Math.round((a % 1e8) / 1e4); return s + e + '억' + (m ? ' ' + m.toLocaleString() + '만' : '') + '원'; }
+  if (a >= 1e4) return s + Math.round(a / 1e4).toLocaleString() + '만원';
+  return s + Math.round(a).toLocaleString() + '원';
+};
+const pct = (v, d = 2, sign = true) => isFinite(v) ? (sign && v > 0 ? '+' : '') + (v * 100).toFixed(d) + '%' : '—';
+const sgnUsd = v => (v > 0 ? '+' : '') + usd(v);
+const cls = v => v > 0 ? 'up' : v < 0 ? 'down' : '';
+const parseGoal = s => {
+  if (typeof s === 'number') return s;
+  s = String(s || '').replace(/[,\s원]/g, '');
+  const m = s.match(/^([\d.]+)(조|억|천만|백만|만)?$/);
+  if (!m) return NaN;
+  return Number(m[1]) * ({ '조': 1e12, '억': 1e8, '천만': 1e7, '백만': 1e6, '만': 1e4 }[m[2]] || 1);
+};
+
+/* ---------- 상태 ---------- */
+const LS = 'miracle1.v1';
+const DEFAULT = {
+  active: 's17', theme: 'auto', kimpSrc: 'xrp', kimpV: 2, fxManual: null, kimpManual: null, market: null, prefsU: 0, deleted: {},
+  seasons: [{ id: 's17', name: '새 시즌', start: todayS(), principal: 10000, rate: 0.02, days: 339, goalKRW: 1e8, records: {}, withdrawals: [], u: 0 }]
+};
+let state;
+let fromLS = false;
+try { const raw = JSON.parse(localStorage.getItem(LS)); if (raw) { state = raw; fromLS = true; } } catch (e) { }
+if (!state) state = structuredClone(DEFAULT);
+// 동기화용 수정 시각(u) 보정: 기존 데이터는 1, 처음 여는 기기의 빈 기본값은 0 (원격 데이터가 이김)
+const stampAll = (u, force) => { for (const x of state.seasons) { if (force || x.u == null) x.u = fromLS || force ? u : 0; x.withdrawals ||= []; for (const r of Object.values(x.records)) if (force || r.u == null) r.u = u; for (const w of x.withdrawals) if (force || w.u == null) w.u = u; } };
+stampAll(1); state.deleted ||= {};
+if (!state.kimpV) { state.kimpSrc = 'xrp'; state.kimpV = 2; }
+const save = () => { try { localStorage.setItem(LS, JSON.stringify(state)); } catch (e) { toast('브라우저 저장소에 저장하지 못했어요. 백업을 내보내 두세요.'); } };
+const S = () => state.seasons.find(s => s.id === state.active) || state.seasons[0];
+const dayN = (s, d) => diffD(s.start, d) + 1;
+const dateOf = (s, n) => addD(s.start, n - 1);
+const guide = (s, n) => s.principal * Math.pow(1 + s.rate, n);
+
+/* ---------- 시세 (환율·김프) ---------- */
+let market = state.market || {};
+const getJSON = async (url) => { const r = await fetch(url, { cache: 'no-store' }); if (!r.ok) throw new Error(r.status); return r.json(); };
+async function fetchMarket() {
+  $('#refreshBtn').classList.add('spin');
+  const m = { ...market };
+  const [up, bn, fx] = await Promise.allSettled([
+    getJSON('https://api.upbit.com/v1/ticker?markets=KRW-USDT,KRW-BTC,KRW-XRP'),
+    getJSON(`https://api.binance.com/api/v3/ticker/price?symbols=${encodeURIComponent('["BTCUSDT","XRPUSDT"]')}`).catch(() => getJSON(`https://data-api.binance.vision/api/v3/ticker/price?symbols=${encodeURIComponent('["BTCUSDT","XRPUSDT"]')}`)),
+    getJSON('https://open.er-api.com/v6/latest/USD').then(d => ({ v: d.rates.KRW, src: 'ExchangeRate-API', t: d.time_last_update_unix * 1000 }))
+      .catch(() => getJSON('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.min.json').then(d => ({ v: d.usd.krw, src: 'currency-api', t: parseD(d.date).getTime() })))
+  ]);
+  let ok = 0;
+  if (up.status === 'fulfilled') { for (const t of up.value) { if (t.market === 'KRW-USDT') m.usdtKrw = t.trade_price; if (t.market === 'KRW-BTC') m.btcKrw = t.trade_price; if (t.market === 'KRW-XRP') m.xrpKrw = t.trade_price; } ok++; }
+  if (bn.status === 'fulfilled') { for (const t of bn.value) { if (t.symbol === 'BTCUSDT') m.btcUsdt = Number(t.price); if (t.symbol === 'XRPUSDT') m.xrpUsdt = Number(t.price); } ok++; }
+  if (fx.status === 'fulfilled') { m.fx = fx.value.v; m.fxSrc = fx.value.src; m.fxT = fx.value.t; ok++; }
+  if (ok) { m.t = Date.now(); market = m; state.market = m; save(); }
+  $('#refreshBtn').classList.remove('spin');
+  if (ok < 3) toast(ok ? '일부 시세를 불러오지 못해 마지막 값을 사용합니다.' : '시세를 불러오지 못했어요. 마지막 값/수동값을 사용합니다.');
+  render();
+}
+function eff() {
+  const fxAuto = market.fx;
+  const kU = market.usdtKrw && market.fx ? market.usdtKrw / market.fx - 1 : null;
+  const kB = market.btcKrw && market.btcUsdt && market.fx ? market.btcKrw / (market.btcUsdt * market.fx) - 1 : null;
+  // 리플 김프: 바이낸스에서 USDT로 XRP를 사서 업비트에서 원화로 팔 때의 비율
+  const kX = market.xrpKrw && market.xrpUsdt && market.fx ? market.xrpKrw / (market.xrpUsdt * market.fx) - 1 : null;
+  const kAuto = { btc: kB, usdt: kU, xrp: kX }[state.kimpSrc];
+  return {
+    fx: state.fxManual ?? fxAuto ?? 1446, fxManual: state.fxManual != null,
+    kimp: state.kimpManual ?? kAuto ?? -0.0064, kimpManual: state.kimpManual != null,
+    kU, kB, kX
+  };
+}
+const toKRW = (usdV, e) => usdV * e.fx * (1 + e.kimp);
+
+/* ---------- 계산 ---------- */
+function compute(s) {
+  const dates = Object.keys(s.records).sort();
+  const wds = s.withdrawals || [];
+  let prev = s.principal, invested = s.principal, idx = 1, peak = 1, mdd = 0, mddAt = null, prevDate = '';
+  const rows = dates.map(d => {
+    // 직전 기록일 다음날 ~ 이번 기록일 사이의 출금은 이번 기록 잔고에 반영된 것으로 봄
+    const wd = wds.filter(w => w.date > prevDate && w.date <= d).reduce((a, w) => a + w.usd, 0);
+    prevDate = d;
+    const r = s.records[d], n = dayN(s, d), dep = Number(r.flow) || 0, flow = dep - wd;
+    invested += flow;
+    const pnl = r.bal - prev - flow;
+    const ret = prev > 0 ? (r.bal - flow) / prev - 1 : 0;
+    idx *= 1 + ret;
+    if (idx > peak) peak = idx;
+    const dd = idx / peak - 1;
+    if (dd < mdd) { mdd = dd; mddAt = d; }
+    const g = guide(s, n);
+    const row = { date: d, n, bal: r.bal, flow, dep, wd, note: r.note || '', fx: r.fx, kimp: r.kimp, prev, pnl, ret, g, vsG: r.bal - g, margin: r.bal / g - 1, invested, profit: r.bal - invested, twr: idx - 1 };
+    prev = r.bal;
+    return row;
+  });
+  const by = Object.fromEntries(rows.map(r => [r.date, r]));
+  const st = { rows, by, n: rows.length, wdUsd: wds.reduce((a, w) => a + w.usd, 0), wdKrw: wds.reduce((a, w) => a + (w.krw || 0), 0), wdN: wds.length };
+  if (rows.length) {
+    const last = rows[rows.length - 1], rets = rows.map(r => r.ret);
+    st.last = last;
+    st.wins = rets.filter(x => x > 0).length; st.losses = rets.filter(x => x < 0).length;
+    st.geo = last.n > 0 ? Math.pow(idx, 1 / last.n) - 1 : 0;
+    st.arith = rets.reduce((a, b) => a + b, 0) / rets.length;
+    st.vol = Math.sqrt(rets.reduce((a, b) => a + (b - st.arith) ** 2, 0) / rets.length);
+    st.best = rows.reduce((a, b) => b.ret > a.ret ? b : a); st.worst = rows.reduce((a, b) => b.ret < a.ret ? b : a);
+    st.mdd = mdd; st.mddAt = mddAt;
+    let k = rows.length - 1, sign = Math.sign(rows[k].ret), c = 0;
+    while (k >= 0 && Math.sign(rows[k].ret) === sign && sign !== 0) { c++; k--; }
+    st.streak = { sign, c };
+    st.aheadDays = Math.log(last.bal / last.g) / Math.log(1 + s.rate);
+    st.hitDays = rows.filter(r => r.ret >= s.rate).length;
+  }
+  return st;
+}
+
+/* ---------- 렌더 ---------- */
+let C;
+function render() {
+  const s = S(), e = eff();
+  C = compute(s);
+  renderSeasonSel(); renderChips(e); renderKPIs(s, e); renderPreview(); renderStats(s); renderMonthly(s, e); renderLedger(s, e); renderCharts();
+  $('#wdCnt').textContent = (s.withdrawals || []).length || '';
+  if (guideDlg.open) renderGuide();
+  if (wdDlg.open) renderWd();
+}
+function renderSeasonSel() {
+  $('#seasonSel').innerHTML = state.seasons.map(x => `<option value="${x.id}" ${x.id === state.active ? 'selected' : ''}>${esc(x.name)}</option>`).join('');
+}
+function renderChips(e) {
+  const kLabel = { btc: 'BTC 김프', usdt: '테더 김프', xrp: '리플 김프' }[state.kimpSrc];
+  $('#chips').innerHTML = `
+    <span class="chip num ${e.fxManual ? 'manual' : ''}" title="${e.fxManual ? '수동 고정값' : (market.fxSrc || '') + ' 기준 · 매일 갱신'}"><span class="lbl">환율</span><b>${e.fx.toLocaleString('ko-KR', { maximumFractionDigits: 2 })}</b>${e.fxManual ? '<span class="lbl">고정</span>' : ''}</span>
+    <span class="chip num ${e.kimpManual ? 'manual' : ''}" title="리플 ${pct(e.kX)} · 테더 ${pct(e.kU)} · BTC ${pct(e.kB)}"><span class="lbl">${e.kimpManual ? '김프' : kLabel}</span><b class="${cls(e.kimp)}">${pct(e.kimp)}</b>${e.kimpManual ? '<span class="lbl">고정</span>' : ''}</span>
+    ${market.xrpKrw ? `<span class="chip num" title="바이낸스 ${market.xrpUsdt} USDT"><span class="lbl">XRP</span><b>${market.xrpKrw.toLocaleString()}</b></span>` : ''}`;
+  $('#stamp').textContent = market.t ? new Date(market.t).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }) + ' 갱신' : '';
+}
+function kpi(k, v, s, extra = '') { return `<div class="kpi"><div class="k">${k}</div><div class="v num">${v}</div>${extra}<div class="s num">${s}</div></div>`; }
+function renderKPIs(s, e) {
+  const t = todayS(), tn = dayN(s, t), end = dateOf(s, s.days), L = C.last;
+  const goalUSD = s.goalKRW / (e.fx * (1 + e.kimp));
+  const out = [];
+  if (L) {
+    out.push(kpi(`현재 잔고 <span class="muted">${md(L.date)} · ${L.n}일차</span>`, usd(L.bal), `≈ ${krwShort(toKRW(L.bal, e))} <span class="muted">(김프 반영)</span>`));
+    out.push(kpi('누적 수익', `<span class="${cls(L.profit)}">${sgnUsd(L.profit)}</span>`, `<span class="${cls(L.twr)}">${pct(L.twr)}</span> · ${krwShort(toKRW(L.profit, e))} <span class="muted">원금 ${usd(s.principal, 0)}</span>`));
+    const a = C.aheadDays;
+    const badge = L.margin >= 0 ? `<span class="badge good">가이드 이상</span>` : `<span class="badge warn">가이드 미달</span>`;
+    out.push(kpi(`가이드 대비 ${badge}`, `<span class="${cls(L.margin)}">${pct(L.margin)}</span>`, `${sgnUsd(L.vsG)} · ${Math.abs(a) < 0.05 ? '가이드와 같은 페이스' : `가이드보다 <b>${Math.abs(a).toFixed(1)}일</b> ${a > 0 ? '앞섬' : '뒤처짐'}`}`));
+  } else {
+    out.push(kpi('현재 잔고', usd(s.principal), `원금 · 아직 기록이 없어요`));
+    out.push(kpi('누적 수익', '—', '첫 실적을 입력하면 계산돼요'));
+    out.push(kpi('가이드 대비', '—', `일 목표 ${pct(s.rate, 1, false)} 복리`));
+  }
+  // 오늘 목표
+  const gT = guide(s, Math.max(tn, 0));
+  const base = L ? L.bal : s.principal;
+  out.push(kpi(`오늘 목표 <span class="muted">${tn >= 1 ? tn + '일차' : '시작 전'}</span>`, usd(gT), `${krwShort(toKRW(gT, e))} · 최근 잔고 대비 <span class="${cls(gT / base - 1)}">${pct(gT / base - 1)}</span> 필요`));
+  // 졸업 목표 금액
+  const cur = L ? L.bal : s.principal, prog = Math.min(1, toKRW(cur, e) / s.goalKRW);
+  let eta;
+  if (cur >= goalUSD) eta = '<b>달성!</b>';
+  else if (L && C.geo > 0) { const k = Math.ceil(Math.log(goalUSD / cur) / Math.log(1 + C.geo)); eta = `현재 페이스(${pct(C.geo, 2, false)}/일)면 <b>${addD(L.date, k)}</b>`; }
+  else eta = '현재 페이스로는 예측 불가';
+  const gN = Math.ceil(Math.log(goalUSD / s.principal) / Math.log(1 + s.rate));
+  out.push(kpi(`졸업 목표 ${krwShort(s.goalKRW)}`, `${(prog * 100).toFixed(prog < .01 ? 3 : 1)}%`, `${eta}<br><span class="muted">가이드대로면 ${gN}일차 (${dateOf(s, gN)})${gN > s.days ? ' · 플랜 초과' : ''}</span>`, `<div class="bar"><i style="width:${Math.max(prog * 100, .5)}%"></i></div>`));
+  // 졸업일
+  const left = diffD(t, end), dprog = Math.min(1, Math.max(0, (tn - 1) / s.days));
+  out.push(kpi(`졸업 예정일 <span class="muted">${s.days}일 플랜</span>`, left >= 0 ? `D-${left}` : `D+${-left}`, `${longD(end)} · 가이드 ${usdShort(guide(s, s.days))}`, `<div class="bar"><i style="width:${Math.max(dprog * 100, .5)}%"></i></div>`));
+  $('#kpis').innerHTML = out.join('');
+}
+function renderStats(s) {
+  const el = $('#stats');
+  if (!C.n) { el.innerHTML = `<div class="stat" style="grid-column:1/-1"><div class="empty">기록이 쌓이면 통계가 여기에 표시됩니다.</div></div>`; return; }
+  const st = C, t = todayS(), elapsed = Math.max(1, Math.min(dayN(s, t), s.days));
+  const items = [
+    ['평균 일수익률', `<span class="${cls(st.geo)}">${pct(st.geo, 2)}</span>`, `복리 기준 · 목표 ${pct(s.rate, 1, false)}`],
+    ['단순 평균', `<span class="${cls(st.arith)}">${pct(st.arith, 2)}</span>`, `기록일 산술평균`],
+    ['승률', pct(st.wins / st.n, 0, false), `${st.wins}승 ${st.losses}패 ${st.n - st.wins - st.losses ? (st.n - st.wins - st.losses) + '보합' : ''}`],
+    ['목표 달성일', `${st.hitDays}일`, `일 ${pct(s.rate, 1, false)} 이상 · ${pct(st.hitDays / st.n, 0, false)}`],
+    ['최고의 날', `<span class="${cls(st.best.ret)}">${pct(st.best.ret)}</span>`, `${st.best.date} · ${sgnUsd(st.best.pnl)}`],
+    ['최악의 날', `<span class="${cls(st.worst.ret)}">${pct(st.worst.ret)}</span>`, `${st.worst.date} · ${sgnUsd(st.worst.pnl)}`],
+    ['최대 낙폭 (MDD)', `<span class="${st.mdd < 0 ? 'down' : ''}">${pct(st.mdd)}</span>`, st.mddAt ? `최저점 ${st.mddAt}` : '낙폭 없음'],
+    ['연속 기록', st.streak.c ? `${st.streak.c}일 ${st.streak.sign > 0 ? '상승' : '하락'}` : '—', '최근 기준'],
+    ['변동성', pct(st.vol, 2, false), '일 수익률 표준편차'],
+    ['총 출금', st.wdN ? usd(st.wdUsd) : '—', st.wdN ? `${st.wdN}회 · ${krwShort(st.wdKrw)}` : '출금 내역 없음'],
+    ['기록 일수', `${st.n}일`, `경과 ${elapsed}일 중 · 입력률 ${pct(st.n / elapsed, 0, false)}`],
+  ];
+  el.innerHTML = items.map(([k, v, s2]) => `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s2}</div></div>`).join('');
+}
+function renderMonthly(s, e) {
+  const el = $('#monthly');
+  if (!C.n) { el.innerHTML = `<div class="empty">기록이 없습니다.</div>`; return; }
+  const g = {};
+  for (const r of C.rows) {
+    const k = r.date.slice(0, 7);
+    (g[k] ||= { start: r.prev, idx: 1, pnl: 0, flow: 0, n: 0, w: 0 });
+    const m = g[k]; m.end = r.bal; m.idx *= 1 + r.ret; m.pnl += r.pnl; m.flow += r.flow; m.n++; if (r.ret > 0) m.w++;
+  }
+  el.innerHTML = `<table class="num"><thead><tr><th>월</th><th>기록</th><th>시작</th><th>마감</th><th>손익</th><th>수익률</th><th>일평균</th><th>승률</th><th>입출금</th><th>손익(원)</th></tr></thead><tbody>` +
+    Object.entries(g).reverse().map(([k, m]) => `<tr><td>${k.replace('-', '.')}</td><td>${m.n}일</td><td>${usd(m.start)}</td><td>${usd(m.end)}</td><td class="${cls(m.pnl)}">${sgnUsd(m.pnl)}</td><td class="${cls(m.idx - 1)}">${pct(m.idx - 1)}</td><td>${pct(Math.pow(m.idx, 1 / m.n) - 1)}</td><td>${pct(m.w / m.n, 0, false)}</td><td>${m.flow ? sgnUsd(m.flow) : '<span class="muted">—</span>'}</td><td class="${cls(m.pnl)}">${krwShort(toKRW(m.pnl, e))}</td></tr>`).join('') + `</tbody></table>`;
+}
+let ledgerMode = 'rec';
+function renderLedger(s, e) {
+  const el = $('#ledger'), t = todayS();
+  let ns;
+  if (ledgerMode === 'all') ns = Array.from({ length: s.days }, (_, i) => i + 1);
+  else ns = C.rows.map(r => r.n).reverse();
+  if (!ns.length) { el.innerHTML = `<div class="empty">아직 기록이 없어요. 위에서 오늘 잔고를 입력해 보세요.</div>`; return; }
+  const head = `<thead><tr><th>일차</th><th>날짜</th><th>목표 가이드</th><th>실적</th><th>전일 대비</th><th>일수익률</th><th>가이드 대비</th><th>여유율</th><th>원금 대비</th><th>원화 (김프)</th><th></th></tr></thead>`;
+  const body = ns.map(n => {
+    const d = dateOf(s, n), r = C.by[d], g = guide(s, n);
+    const trc = [d === t ? 'today' : '', r ? 'rec' : '', !r && d > t ? 'future' : ''].join(' ');
+    if (!r) return `<tr class="${trc}" data-d="${d}"><td>${n}</td><td>${longD(d)}</td><td>${usd(g)}</td><td class="muted">—</td><td></td><td></td><td></td><td></td><td></td><td>${krwShort(toKRW(g, e))}</td><td class="act"></td></tr>`;
+    const re = { fx: r.fx ?? e.fx, kimp: r.kimp ?? e.kimp };
+    return `<tr class="${trc}" data-d="${d}"><td>${n}</td><td>${longD(d)}${r.note ? `<span class="note">${esc(r.note)}</span>` : ''}${r.dep ? `<span class="note">입금 ${sgnUsd(r.dep)}</span>` : ''}${r.wd ? `<span class="note">출금 ${usd(-r.wd)}</span>` : ''}</td><td class="muted">${usd(g)}</td><td><b>${usd(r.bal)}</b></td><td class="${cls(r.pnl)}">${sgnUsd(r.pnl)}</td><td class="${cls(r.ret)}">${pct(r.ret)}</td><td class="${cls(r.vsG)}">${sgnUsd(r.vsG)}</td><td class="${cls(r.margin)}">${pct(r.margin)}</td><td class="${cls(r.profit)}">${sgnUsd(r.profit)}</td><td title="환율 ${re.fx.toFixed(1)} · 김프 ${pct(re.kimp)} (입력 시점)">${krw(toKRW(r.bal, re))}</td><td class="act"><button class="del" data-del="${d}" title="삭제">×</button></td></tr>`;
+  }).join('');
+  el.innerHTML = `<table class="num">${head}<tbody>${body}</tbody></table>`;
+  if (ledgerMode === 'all') { const tr = el.querySelector('tr.today'); if (tr) el.scrollTop = tr.offsetTop - 80; }
+}
+
+/* ---------- 입력 ---------- */
+function prevRecordBefore(s, d) {
+  const ds = Object.keys(s.records).filter(x => x < d).sort();
+  return ds.length ? s.records[ds[ds.length - 1]] : null;
+}
+function loadEntry(d) {
+  const s = S(), r = s.records[d];
+  $('#inDate').value = d;
+  $('#inBal').value = r ? r.bal : '';
+  $('#inFlow').value = r && r.flow ? r.flow : '';
+  $('#inNote').value = r ? (r.note || '') : '';
+  $('#flowBox').hidden = !(r && (r.flow || r.note));
+  $('#flowToggle').hidden = !$('#flowBox').hidden;
+  renderPreview();
+}
+function renderPreview() {
+  const s = S(), d = $('#inDate').value || todayS(), n = dayN(s, d), g = guide(s, n);
+  const exists = !!s.records[d];
+  $('#entryDay').textContent = n >= 1 ? `${n}일차${n > s.days ? ' · 플랜 이후' : ''}` : '시작일 이전';
+  $('#saveBtn').textContent = exists ? '수정 저장' : '저장';
+  const bal = num($('#inBal').value), flow = num($('#inFlow').value) || 0;
+  const p = prevRecordBefore(s, d), pb = p ? p.bal : s.principal;
+  let h = `<div><span>오늘 가이드</span><span>${usd(g)}</span></div>`;
+  if (isFinite(bal) && bal > 0) {
+    const ret = (bal - flow) / pb - 1, m = bal / g - 1;
+    h += `<div><span>${p ? '직전 기록' : '원금'} 대비</span><span class="${cls(ret)}">${sgnUsd(bal - pb - flow)} (${pct(ret)})</span></div>`;
+    h += `<div><span>가이드 대비</span><span class="${cls(m)}">${pct(m)}</span></div>`;
+  } else {
+    h += `<div><span>${p ? '직전 기록' : '원금'}</span><span>${usd(pb)}</span></div>`;
+  }
+  $('#preview').innerHTML = h;
+}
+function saveEntry() {
+  const s = S(), d = $('#inDate').value, bal = num($('#inBal').value);
+  if (!d) return toast('날짜를 선택하세요.');
+  if (!(bal > 0)) { $('#inBal').focus(); return toast('잔고를 입력하세요.'); }
+  if (dayN(s, d) < 1) return toast('시즌 시작일 이전 날짜예요. 설정에서 시작일을 확인하세요.');
+  const flow = num($('#inFlow').value) || 0, note = $('#inNote').value.trim(), e = eff();
+  const existed = !!s.records[d];
+  s.records[d] = { bal, flow, note, fx: e.fx, kimp: e.kimp, u: Date.now() };
+  commit(); render();
+  $('#entryStatus').textContent = `${longD(d)} ${existed ? '수정됨' : '저장됨'} · ${usd(bal)}`;
+  toast(existed ? '수정했어요' : '저장했어요');
+}
+
+/* ---------- 차트 ---------- */
+const SVGNS = 'http://www.w3.org/2000/svg';
+function niceTicks(lo, hi, count = 5) {
+  if (lo === hi) { lo -= 1; hi += 1; }
+  const step0 = (hi - lo) / count, mag = Math.pow(10, Math.floor(Math.log10(step0))), f = step0 / mag;
+  const step = (f < 1.5 ? 1 : f < 3 ? 2 : f < 7 ? 5 : 10) * mag;
+  const out = []; for (let v = Math.ceil(lo / step) * step; v <= hi + step * 1e-9; v += step) out.push(+v.toPrecision(12));
+  return { ticks: out, lo: Math.floor(lo / step) * step, hi: Math.ceil(hi / step) * step };
+}
+function logTicks(lo, hi) {
+  const out = []; for (let e = Math.floor(Math.log10(lo)); e <= Math.ceil(Math.log10(hi)); e++) for (const m of [1, 2, 5]) { const v = m * 10 ** e; if (v >= lo && v <= hi) out.push(v); }
+  return out.length > 7 ? out.filter(v => /^1/.test(String(v))) : out;
+}
+let range = 'rec', logScale = false;
+function renderCharts() { renderBal(); renderRet(); }
+function tipRow(color, label, val, dash) {
+  return `<div class="r"><span>${color ? `<i class="sw${dash ? ' dash' : ''}" style="border-color:${color}"></i>` : ''}${label}</span><span>${val}</span></div>`;
+}
+function renderBal() {
+  const s = S(), el = $('#balChart'), W = el.clientWidth || 800, H = W < 560 ? 230 : 300;
+  const tn = Math.max(1, dayN(s, todayS())), lastN = C.last ? C.last.n : 0;
+  let x0 = 0, x1;
+  if (range === 'plan') x1 = s.days;
+  else if (range === 'rec') x1 = Math.max(lastN, Math.min(tn, s.days)) + 3;
+  else { x1 = Math.max(lastN, Math.min(tn, s.days)) + 3; x0 = Math.max(0, x1 - (+range)); }
+  const useLog = logScale;
+  const m = { l: 62, r: 16, t: 14, b: 26 }, iw = W - m.l - m.r, ih = H - m.t - m.b;
+  const gpts = []; for (let n = x0; n <= x1; n++) gpts.push([n, guide(s, n)]);
+  const apts = [[0, s.principal], ...C.rows.map(r => [r.n, r.bal])].filter(p => p[0] >= x0 && p[0] <= x1);
+  const vals = [...gpts.map(p => p[1]), ...apts.map(p => p[1])];
+  let lo = Math.min(...vals), hi = Math.max(...vals), yt, Y;
+  if (useLog) { lo *= 0.95; hi *= 1.05; yt = logTicks(lo, hi); const L0 = Math.log(lo), L1 = Math.log(hi); Y = v => m.t + ih - (Math.log(v) - L0) / (L1 - L0) * ih; }
+  else { const pad = (hi - lo) * 0.06 || hi * 0.05; const nt = niceTicks(Math.max(0, lo - pad), hi + pad, 5); yt = nt.ticks; lo = nt.lo; hi = nt.hi; Y = v => m.t + ih - (v - lo) / (hi - lo) * ih; }
+  const X = n => m.l + (n - x0) / Math.max(1, x1 - x0) * iw;
+  const xt = []; const stepX = Math.max(1, Math.ceil((x1 - x0) / Math.max(2, Math.floor(iw / 80))));
+  for (let n = x0; n <= x1; n += stepX) xt.push(n);
+  const path = pts => pts.map((p, i) => (i ? 'L' : 'M') + X(p[0]).toFixed(1) + ',' + Y(p[1]).toFixed(1)).join('');
+  let svg = `<svg viewBox="0 0 ${W} ${H}" height="${H}" role="img" aria-label="잔고 추이 차트">`;
+  svg += `<g class="grid">${yt.map(v => `<line x1="${m.l}" x2="${W - m.r}" y1="${Y(v)}" y2="${Y(v)}"/>`).join('')}</g>`;
+  svg += `<g class="axis">${yt.map(v => `<text x="${m.l - 8}" y="${Y(v) + 4}" text-anchor="end">${usdShort(v)}</text>`).join('')}`;
+  svg += xt.map(n => `<text x="${X(n)}" y="${H - 6}" text-anchor="middle">${n === 0 ? '원금' : md(dateOf(s, n))}</text>`).join('') + `</g>`;
+  const tx = X(tn); if (tn >= x0 && tn <= x1) svg += `<line x1="${tx}" x2="${tx}" y1="${m.t}" y2="${m.t + ih}" stroke="var(--text-3)" stroke-width="1" stroke-dasharray="2 3"/><text x="${tx + 4}" y="${m.t + 10}" fill="var(--text-3)" font-size="11">오늘</text>`;
+  svg += `<path d="${path(gpts)}" fill="none" stroke="var(--guide)" stroke-width="2" stroke-dasharray="5 4"/>`;
+  if (apts.length > 1) svg += `<path d="${path(apts)}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/>`;
+  if (apts.length <= 60) svg += apts.map(p => `<circle cx="${X(p[0])}" cy="${Y(p[1])}" r="4" fill="var(--accent)" stroke="var(--surface)" stroke-width="2"/>`).join('');
+  if (C.last && C.last.n >= x0 && C.last.n <= x1) {
+    const lx = X(C.last.n), ly = Y(C.last.bal), anchor = lx > W - 90 ? 'end' : 'start';
+    svg += `<text x="${lx + (anchor === 'end' ? -8 : 8)}" y="${ly - 8}" text-anchor="${anchor}" font-size="12" font-weight="650" fill="var(--text)">${usd(C.last.bal, 0)}</text>`;
+  }
+  svg += `<g id="balHover" style="display:none"><line id="bhL" y1="${m.t}" y2="${m.t + ih}" stroke="var(--text-3)"/><circle id="bhG" r="4" fill="var(--guide)" stroke="var(--surface)" stroke-width="2"/><circle id="bhA" r="5" fill="var(--accent)" stroke="var(--surface)" stroke-width="2"/></g>`;
+  svg += `<rect x="${m.l}" y="${m.t}" width="${iw}" height="${ih}" fill="transparent" id="balHit"/></svg><div class="tip" id="balTip"></div>`;
+  el.innerHTML = svg;
+  const hit = el.querySelector('#balHit'), tip = el.querySelector('#balTip'), hov = el.querySelector('#balHover');
+  const move = ev => {
+    const rect = el.querySelector('svg').getBoundingClientRect(), mx = (ev.clientX - rect.left) * (W / rect.width);
+    const n = Math.max(x0, Math.min(x1, Math.round(x0 + (mx - m.l) / iw * (x1 - x0))));
+    const d = n === 0 ? null : dateOf(s, n), r = d && C.by[d], g = guide(s, n);
+    hov.style.display = '';
+    hov.querySelector('#bhL').setAttribute('x1', X(n)); hov.querySelector('#bhL').setAttribute('x2', X(n));
+    hov.querySelector('#bhG').setAttribute('cx', X(n)); hov.querySelector('#bhG').setAttribute('cy', Y(g));
+    const a = hov.querySelector('#bhA');
+    const av = n === 0 ? s.principal : r ? r.bal : null;
+    if (av != null) { a.style.display = ''; a.setAttribute('cx', X(n)); a.setAttribute('cy', Y(av)); } else a.style.display = 'none';
+    tip.innerHTML = `<div class="t">${n === 0 ? '시작 (원금)' : `${longD(d)} · ${n}일차`}</div>` +
+      (av != null ? tipRow('var(--accent)', '실적', usd(av)) : '') + tipRow('var(--guide)', '가이드', usd(g), true) +
+      (r ? `<div class="r"><span>여유율</span><span class="${cls(r.margin)}">${pct(r.margin)}</span></div><div class="r"><span>일수익률</span><span class="${cls(r.ret)}">${pct(r.ret)}</span></div>` : '');
+    tip.style.opacity = 1;
+    const px = X(n) / W * rect.width, tw = tip.offsetWidth;
+    tip.style.left = (px + 14 + tw > rect.width ? px - tw - 14 : px + 14) + 'px';
+    tip.style.top = '10px';
+  };
+  hit.addEventListener('pointermove', move); hit.addEventListener('pointerdown', move);
+  hit.addEventListener('pointerleave', () => { hov.style.display = 'none'; tip.style.opacity = 0; });
+}
+function renderRet() {
+  const s = S(), el = $('#retChart'), W = el.clientWidth || 600, H = W < 560 ? 200 : 330;
+  const rows = C.rows;
+  if (!rows.length) { el.innerHTML = `<div class="empty">기록이 쌓이면 일별 수익률이 표시됩니다.</div>`; return; }
+  const m = { l: 48, r: 12, t: 12, b: 26 }, iw = W - m.l - m.r, ih = H - m.t - m.b;
+  const rets = rows.map(r => r.ret);
+  let lo = Math.min(0, ...rets, s.rate), hi = Math.max(0, ...rets, s.rate);
+  const nt = niceTicks(lo, hi, 4); lo = nt.lo; hi = nt.hi;
+  const Y = v => m.t + ih - (v - lo) / (hi - lo) * ih, y0 = Y(0);
+  const band = iw / Math.max(rows.length, 8), bw = Math.max(2, Math.min(18, band - 2));
+  const X = i => m.l + band * i + band / 2;
+  let svg = `<svg viewBox="0 0 ${W} ${H}" height="${H}" role="img" aria-label="일별 수익률 차트">`;
+  svg += `<g class="grid">${nt.ticks.map(v => `<line x1="${m.l}" x2="${W - m.r}" y1="${Y(v)}" y2="${Y(v)}"/>`).join('')}</g>`;
+  svg += `<g class="axis">${nt.ticks.map(v => `<text x="${m.l - 6}" y="${Y(v) + 4}" text-anchor="end">${(v * 100).toFixed(Math.abs(hi - lo) < 0.05 ? 1 : 0)}%</text>`).join('')}`;
+  const every = Math.max(1, Math.ceil(rows.length / Math.max(2, Math.floor(iw / 56))));
+  svg += rows.map((r, i) => i % every === 0 ? `<text x="${X(i)}" y="${H - 6}" text-anchor="middle">${md(r.date)}</text>` : '').join('') + `</g>`;
+  svg += `<line x1="${m.l}" x2="${W - m.r}" y1="${y0}" y2="${y0}" stroke="var(--text-3)"/>`;
+  svg += rows.map((r, i) => {
+    const y = Y(r.ret), h = Math.abs(y - y0), x = X(i) - bw / 2, rad = Math.min(4, bw / 2, h);
+    if (h < 0.5) return '';
+    const col = r.ret >= 0 ? 'var(--up-fill)' : 'var(--down-fill)';
+    const d = r.ret >= 0
+      ? `M${x},${y0}V${y + rad}Q${x},${y} ${x + rad},${y}H${x + bw - rad}Q${x + bw},${y} ${x + bw},${y + rad}V${y0}Z`
+      : `M${x},${y0}V${y - rad}Q${x},${y} ${x + rad},${y}H${x + bw - rad}Q${x + bw},${y} ${x + bw},${y - rad}V${y0}Z`;
+    return `<path d="${d}" fill="${col}" data-i="${i}"/>`;
+  }).join('');
+  svg += `<line x1="${m.l}" x2="${W - m.r}" y1="${Y(s.rate)}" y2="${Y(s.rate)}" stroke="var(--guide)" stroke-width="1.5" stroke-dasharray="5 4"/>`;
+  svg += `<text x="${W - m.r}" y="${Y(s.rate) - 5}" text-anchor="end" font-size="11" fill="var(--text-2)">목표 ${pct(s.rate, 1, false)}</text>`;
+  svg += `<rect id="retHi" fill="var(--text)" opacity=".06" style="display:none"/>`;
+  svg += rows.map((r, i) => `<rect class="hit" data-i="${i}" x="${m.l + band * i}" y="${m.t}" width="${band}" height="${ih}" fill="transparent"/>`).join('');
+  svg += `</svg><div class="tip" id="retTip"></div>`;
+  el.innerHTML = svg;
+  const tip = el.querySelector('#retTip'), hl = el.querySelector('#retHi');
+  el.querySelectorAll('.hit').forEach(h => {
+    const show = () => {
+      const i = +h.dataset.i, r = rows[i], rect = el.querySelector('svg').getBoundingClientRect();
+      hl.style.display = ''; hl.setAttribute('x', m.l + band * i); hl.setAttribute('y', m.t); hl.setAttribute('width', band); hl.setAttribute('height', ih);
+      tip.innerHTML = `<div class="t">${longD(r.date)} · ${r.n}일차</div><div class="r"><span>일수익률</span><span class="${cls(r.ret)}">${pct(r.ret)}</span></div><div class="r"><span>손익</span><span class="${cls(r.pnl)}">${sgnUsd(r.pnl)}</span></div><div class="r"><span>잔고</span><span>${usd(r.bal)}</span></div>`;
+      tip.style.opacity = 1;
+      const px = X(i) / W * rect.width, tw = tip.offsetWidth;
+      tip.style.left = (px + 14 + tw > rect.width ? px - tw - 14 : px + 14) + 'px'; tip.style.top = '10px';
+    };
+    h.addEventListener('pointerenter', show); h.addEventListener('pointerdown', show);
+    h.addEventListener('click', () => { loadEntry(rows[+h.dataset.i].date); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+  });
+  el.querySelector('svg').addEventListener('pointerleave', () => { tip.style.opacity = 0; hl.style.display = 'none'; });
+}
+
+/* ---------- 설정 ---------- */
+const settings = $('#settings');
+function openSettings() {
+  const s = S();
+  $('#sName').value = s.name; $('#sStart').value = s.start; $('#sPrincipal').value = s.principal;
+  $('#sRate').value = +(s.rate * 100).toFixed(4); $('#sDays').value = s.days; $('#sGoal').value = s.goalKRW.toLocaleString('ko-KR');
+  $('#sGoalHint').textContent = krwShort(s.goalKRW);
+  $('#kSrc').value = state.kimpSrc; $('#fxMan').value = state.fxManual ?? ''; $('#kMan').value = state.kimpManual != null ? +(state.kimpManual * 100).toFixed(4) : '';
+  $('#xlsxPanel').hidden = true;
+  renderSyncPanel();
+  settings.showModal();
+}
+function saveSettings() {
+  const s = S();
+  const p = num($('#sPrincipal').value), r = num($('#sRate').value), d = parseInt($('#sDays').value), g = parseGoal($('#sGoal').value);
+  if (!(p > 0) || !(r > 0) || !(d > 0) || !(g > 0) || !$('#sStart').value) return toast('시즌 값을 확인하세요.');
+  Object.assign(s, { name: $('#sName').value.trim() || s.name, start: $('#sStart').value, principal: p, rate: r / 100, days: d, goalKRW: g, u: Date.now() });
+  state.kimpSrc = $('#kSrc').value; state.prefsU = Date.now();
+  const fm = num($('#fxMan').value), km = num($('#kMan').value);
+  state.fxManual = fm > 0 ? fm : null; state.kimpManual = isFinite(km) ? km / 100 : null;
+  commit(); settings.close(); render(); toast('설정을 저장했어요');
+}
+
+/* 엑셀 가져오기 */
+let XLSXwb = null;
+function loadScript(src) { return new Promise((res, rej) => { const sc = document.createElement('script'); sc.src = src; sc.onload = res; sc.onerror = rej; document.head.appendChild(sc); }); }
+function sheetToSeason(name) {
+  const ws = XLSXwb.Sheets[name], v = a => ws[a] ? ws[a].v : undefined;
+  const rate = typeof v('D2') === 'number' ? v('D2') : (Number((name.match(/([\d.]+)%/) || [])[1]) / 100 || 0.02);
+  const principal = typeof v('H3') === 'number' ? v('H3') : NaN;
+  const c6 = v('C6');
+  const start = typeof c6 === 'number' ? fmtD(new Date(Math.round((c6 - 25569) * DAY) + new Date().getTimezoneOffset() * 60000)) : null;
+  let days = 339;
+  for (let r = 6; r < 2000; r++) if (v('A' + r) === '졸업') { days = v('B' + r); break; }
+  const records = {};
+  if (start) for (let r = 6; r < 6 + 1200; r++) {
+    const b = v('H' + r); if (typeof b !== 'number' || !(b > 0)) continue;
+    const d = addD(start, r - 6), note = v('P' + r);
+    records[d] = { bal: b, flow: 0, note: typeof note === 'string' ? note : '' };
+  }
+  const goal = parseGoal(v('D1'));
+  const nm = (name.match(/(\d+)\s*회차/) || [])[0] || name;
+  return { name: nm, start, principal, rate, days, goalKRW: goal > 0 ? goal : 3e7, records };
+}
+function previewSheet() {
+  const x = sheetToSeason($('#xlsxSheet').value), ks = Object.keys(x.records).sort();
+  const ok = x.start && x.principal > 0;
+  $('#xlsxPreview').innerHTML = ok ? `
+    <div><span>시즌</span><span>${esc(x.name)}</span></div>
+    <div><span>시작일 · 원금</span><span>${x.start} · ${usd(x.principal)}</span></div>
+    <div><span>일 목표 · 플랜</span><span>${pct(x.rate, 2, false)} · ${x.days}일</span></div>
+    <div><span>졸업 목표금액</span><span>${krwShort(x.goalKRW)}</span></div>
+    <div><span>실적 기록</span><span>${ks.length}일${ks.length ? ` (${ks[0]} ${usd(x.records[ks[0]].bal)} → ${ks.at(-1)} ${usd(x.records[ks.at(-1)].bal)})` : ''}</span></div>`
+    : `<div><span>이 시트는 형식이 달라 가져올 수 없어요.</span></div>`;
+  $('#xlsxGo').disabled = !ok;
+}
+async function onXlsx(file) {
+  try {
+    if (!window.XLSX) await loadScript('https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js');
+    XLSXwb = XLSX.read(await file.arrayBuffer(), { type: 'array' });
+    const names = XLSXwb.SheetNames.filter(n => /날짜별/.test(n));
+    if (!names.length) return toast('"날짜별" 시트를 찾지 못했어요.');
+    const pick = names.find(n => /17회차/.test(n)) || names[names.length - 1];
+    $('#xlsxSheet').innerHTML = names.map(n => `<option ${n === pick ? 'selected' : ''}>${esc(n)}</option>`).join('');
+    $('#xlsxPanel').hidden = false; previewSheet();
+  } catch (e) { toast('엑셀을 읽지 못했어요: ' + e.message); }
+}
+function importSheet() {
+  const x = sheetToSeason($('#xlsxSheet').value);
+  const same = state.seasons.find(s => s.name === x.name);
+  if (same) {
+    if (!confirm(`"${x.name}" 시즌이 이미 있어요. 엑셀 내용으로 덮어쓸까요?\n(설정값은 엑셀 기준으로 바뀌고, 엑셀에 없는 날짜의 기록은 유지됩니다)`)) return;
+    const now = Date.now(); for (const r of Object.values(x.records)) r.u = now;
+    const keep = same.records; Object.assign(same, x, { records: { ...keep, ...x.records }, u: now }); state.active = same.id;
+  } else { const now = Date.now(); for (const r of Object.values(x.records)) r.u = now; const id = 's' + now; state.seasons.push({ id, ...x, withdrawals: [], u: now }); state.active = id; }
+  commit(); settings.close(); loadEntry(todayS()); render(); toast(`${x.name} 가져오기 완료`);
+}
+
+/* ---------- 가이드 플랜 ---------- */
+const guideDlg = $('#guideDlg');
+let guideMode = 'rest';
+function renderGuide() {
+  const s = S(), e = eff(), t = todayS(), tn = Math.min(Math.max(dayN(s, t), 1), s.days);
+  const L = C.last, bal = L ? L.bal : s.principal;
+  const gToday = guide(s, tn), gPrev = guide(s, tn - 1), needGuide = gToday - gPrev;
+  const needMine = bal * s.rate, gap = gToday - bal;
+  const wEnd = Math.min(tn + 6, s.days), week = guide(s, wEnd) - gPrev;
+  $('#guideSub').textContent = `일 ${pct(s.rate, 1, false)} 복리 · 원금 ${usd(s.principal, 0)} · ${s.days}일`;
+  $('#guideSum').innerHTML = `
+    <div class="sum hero"><div class="k">오늘 목표 수익 · ${tn}일차</div><div class="v">+${usd(needGuide)}</div><div class="s">≈ ${krwShort(toKRW(needGuide, e))} · 가이드 기준</div></div>
+    <div class="sum"><div class="k">내 잔고 기준 오늘 목표</div><div class="v">+${usd(needMine)}</div><div class="s">${usd(bal)} × ${pct(s.rate, 1, false)} ≈ ${krwShort(toKRW(needMine, e))}</div></div>
+    <div class="sum"><div class="k">오늘 가이드 잔고</div><div class="v">${usd(gToday)}</div><div class="s">${gap > 0 ? `따라잡으려면 <b class="up">+${usd(gap)}</b> (${pct(gap / bal)})` : `가이드보다 <b class="ok">${usd(-gap)}</b> 여유`}</div></div>
+    <div class="sum"><div class="k">앞으로 7일 목표 수익</div><div class="v">+${usd(week)}</div><div class="s">≈ ${krwShort(toKRW(week, e))} · ${md(dateOf(s, tn))}~${md(dateOf(s, wEnd))}</div></div>`;
+  // 원화 마일스톤: 가이드대로 가면 언제 도달하는지
+  const k = e.fx * (1 + e.kimp), curKRW = bal * k;
+  const targets = [...new Set([1e8, 3e8, 5e8, 1e9, 3e9, s.goalKRW])].filter(v => v <= s.goalKRW).sort((a, b) => a - b);
+  $('#guideMiles').innerHTML = targets.map(v => {
+    const n = Math.max(1, Math.ceil(Math.log(v / k / s.principal) / Math.log(1 + s.rate)));
+    const done = curKRW >= v;
+    return `<span class="mile ${done ? 'done' : ''}">${done ? '✓ ' : ''}<b>${krwShort(v)}</b> · ${n}일차 (${dateOf(s, n).slice(2).replace(/-/g, '.')})${n > s.days ? ' 플랜 이후' : ''}</span>`;
+  }).join('');
+  const from = guideMode === 'all' ? 1 : tn, rows = [];
+  for (let n = from; n <= s.days; n++) {
+    const d = dateOf(s, n), g0 = guide(s, n - 1), g1 = guide(s, n), r = C.by[d];
+    const res = r ? (r.bal >= g1 ? `<span class="ok">✓ ${usd(r.bal)}</span>` : `<span class="ng">✗ ${usd(r.bal)}</span>`) : (d < t ? '<span class="muted">미입력</span>' : '');
+    rows.push(`<tr class="${d === t ? 'today' : ''}"><td>${n}</td><td>${longD(d)}</td><td class="muted">${usd(g0)}</td><td><b class="up">+${usd(g1 - g0)}</b></td><td>${krwShort(toKRW(g1 - g0, e))}</td><td><b>${usd(g1)}</b></td><td>${krwShort(toKRW(g1, e))}</td><td class="muted">×${(g1 / s.principal).toLocaleString('en-US', { maximumFractionDigits: 1 })}</td><td>${res}</td></tr>`);
+  }
+  $('#guideTbl').innerHTML = `<table class="num"><thead><tr><th>일차</th><th>날짜</th><th>시작 잔고</th><th>목표 수익</th><th>목표 수익(원)</th><th>목표 잔고</th><th>목표 잔고(원)</th><th>원금 대비</th><th>실적</th></tr></thead><tbody>${rows.join('')}</tbody></table>`;
+}
+$('#guideBtn').onclick = () => { renderGuide(); guideDlg.showModal(); $('#guideTbl').scrollTop = 0; };
+$('#guideSeg').onclick = e => {
+  const b = e.target.closest('button'); if (!b) return;
+  guideMode = b.dataset.m; $('#guideSeg').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); renderGuide();
+  const tr = $('#guideTbl tr.today'); $('#guideTbl').scrollTop = guideMode === 'all' && tr ? tr.offsetTop - 80 : 0;
+};
+
+/* ---------- 출금 ---------- */
+const wdDlg = $('#wdDlg');
+let wdEditing = null;
+const sumBy = (arr, f) => arr.reduce((a, x) => a + (f(x) || 0), 0);
+function wdEst() { const v = num($('#wdUsd').value); $('#wdKrw').placeholder = v > 0 ? '≈ ' + Math.round(toKRW(v, eff())).toLocaleString('ko-KR') + ' (자동)' : '자동 계산'; }
+function wdReset() { wdEditing = null; $('#wdDate').value = todayS(); $('#wdUsd').value = ''; $('#wdKrw').value = ''; $('#wdNote').value = ''; $('#wdSave').textContent = '추가'; $('#wdCancel').hidden = true; wdEst(); }
+function renderWd() {
+  const s = S(), asc = (s.withdrawals || []).slice().sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+  let acc = 0; const cum = new Map(asc.map(w => [w.id, acc += w.usd]));
+  const list = asc.reverse();
+  const tU = sumBy(list, w => w.usd), tK = sumBy(list, w => w.krw);
+  const ym = todayS().slice(0, 7), thisM = list.filter(w => w.date.startsWith(ym));
+  const gross = C.last ? C.last.profit : 0; // 출금액까지 포함한 누적 수익
+  $('#wdSum').innerHTML = `
+    <div class="sum hero"><div class="k">총 출금</div><div class="v">${usd(tU)}</div><div class="s">${krw(tK)}</div></div>
+    <div class="sum"><div class="k">이번 달 출금</div><div class="v">${usd(sumBy(thisM, w => w.usd))}</div><div class="s">${krw(sumBy(thisM, w => w.krw))}</div></div>
+    <div class="sum"><div class="k">출금 횟수</div><div class="v">${list.length}회</div><div class="s">${list.length ? `평균 ${usd(tU / list.length)}` : '—'}</div></div>
+    <div class="sum"><div class="k">누적 수익 중 출금 비중</div><div class="v">${gross > 0 && tU ? pct(tU / gross, 1, false) : '—'}</div><div class="s">누적 수익 ${sgnUsd(gross)} (출금 포함)</div></div>`;
+  if (!list.length) { $('#wdTbl').innerHTML = `<div class="empty">아직 출금 내역이 없어요.</div>`; return; }
+  const byMonth = {};
+  list.forEach(w => (byMonth[w.date.slice(0, 7)] ||= []).push(w));
+  const mh = 'style="background:var(--surface-2);font-weight:600"';
+  let html = '';
+  for (const [k, ws] of Object.entries(byMonth)) {
+    html += `<tr><td ${mh}>${k.replace('-', '.')}</td><td ${mh}>${ws.length}건</td><td ${mh}>${usd(sumBy(ws, w => w.usd))}</td><td ${mh}>${krw(sumBy(ws, w => w.krw))}</td><td ${mh}></td><td ${mh}></td><td ${mh}></td></tr>`;
+    html += ws.map(w => { const n = dayN(s, w.date); return `<tr class="rec ${wdEditing === w.id ? 'editing' : ''}" data-id="${w.id}"><td>${longD(w.date)}</td><td class="muted">${n >= 1 ? n + '일차' : ''}</td><td><b>${usd(w.usd)}</b></td><td>${krw(w.krw)}${w.est ? ' <span class="muted" title="입력 당시 환율·김프로 추정">추정</span>' : ''}</td><td style="text-align:left">${esc(w.note || '')}</td><td class="muted">${usd(cum.get(w.id))}</td><td class="act"><button class="del" data-wdel="${w.id}" title="삭제">×</button></td></tr>`; }).join('');
+  }
+  $('#wdTbl').innerHTML = `<table class="num"><thead><tr><th>날짜</th><th>일차</th><th>출금액</th><th>원화</th><th style="text-align:left">메모</th><th>누적 출금</th><th></th></tr></thead><tbody>${html}</tbody></table>`;
+}
+function wdSave() {
+  const s = S(), d = $('#wdDate').value, u = num($('#wdUsd').value), kIn = num($('#wdKrw').value), e = eff();
+  if (!d) return toast('날짜를 선택하세요.');
+  if (!(u > 0)) { $('#wdUsd').focus(); return toast('출금액(USD)을 입력하세요.'); }
+  const est = !(kIn > 0);
+  const item = { id: wdEditing || ('w' + Date.now()), date: d, usd: u, krw: est ? Math.round(toKRW(u, e)) : kIn, est, note: $('#wdNote').value.trim(), fx: e.fx, kimp: e.kimp, u: Date.now() };
+  s.withdrawals ||= [];
+  const i = s.withdrawals.findIndex(w => w.id === item.id);
+  if (i >= 0) s.withdrawals[i] = item; else s.withdrawals.push(item);
+  commit(); wdReset(); render(); toast(i >= 0 ? '출금 내역을 수정했어요' : '출금을 기록했어요');
+}
+$('#wdBtn').onclick = () => { wdReset(); renderWd(); wdDlg.showModal(); $('#wdUsd').focus(); };
+$('#wdUsd').addEventListener('input', wdEst);
+['#wdUsd', '#wdKrw', '#wdNote'].forEach(x => $(x).addEventListener('keydown', e => { if (e.key === 'Enter') wdSave(); }));
+$('#wdSave').onclick = wdSave;
+$('#wdCancel').onclick = () => { wdReset(); renderWd(); };
+$('#wdTbl').onclick = e => {
+  const s = S(), del = e.target.closest('[data-wdel]');
+  if (del) {
+    const w = s.withdrawals.find(x => x.id === del.dataset.wdel);
+    if (w && confirm(`${longD(w.date)} ${usd(w.usd)} 출금 내역을 삭제할까요?`)) { s.withdrawals = s.withdrawals.filter(x => x !== w); state.deleted[`wd:${s.id}:${w.id}`] = Date.now(); if (wdEditing === w.id) wdReset(); commit(); render(); }
+    return;
+  }
+  const tr = e.target.closest('tr[data-id]'); if (!tr) return;
+  const w = s.withdrawals.find(x => x.id === tr.dataset.id); if (!w) return;
+  wdEditing = w.id; $('#wdDate').value = w.date; $('#wdUsd').value = w.usd; $('#wdKrw').value = w.est ? '' : w.krw; $('#wdNote').value = w.note || '';
+  $('#wdSave').textContent = '수정'; $('#wdCancel').hidden = false; wdEst(); renderWd();
+};
+
+/* ---------- 기기 간 동기화 (GitHub 비공개 Gist) ---------- */
+// 토큰·Gist ID는 이 기기에만 저장 (백업 파일·Gist에는 들어가지 않음)
+const SK = 'miracle1.sync', GFILE = 'miracle1-data.json';
+let sync = {};
+try { sync = JSON.parse(localStorage.getItem(SK)) || {}; } catch (e) { }
+const saveSync = () => { try { localStorage.setItem(SK, JSON.stringify(sync)); } catch (e) { } };
+let syncBusy = false, syncAgain = false, syncTimer, syncStatus = sync.token ? 'idle' : 'off', syncErr = '';
+const canon = o => JSON.stringify(o, (k, v) => v && typeof v === 'object' && !Array.isArray(v) ? Object.fromEntries(Object.keys(v).sort().map(x => [x, v[x]])) : v);
+
+async function gh(method, path, body) {
+  const r = await fetch('https://api.github.com' + path, {
+    method, cache: 'no-store',
+    headers: { Authorization: 'Bearer ' + sync.token, Accept: 'application/vnd.github+json', ...(body ? { 'Content-Type': 'application/json' } : {}) },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  if (!r.ok) {
+    throw new Error({ 401: '토큰이 올바르지 않거나 만료됐어요. 새 토큰으로 다시 연결하세요.', 404: '동기화 저장소(Gist)를 찾지 못했어요. 토큰에 gist 권한이 있는지 확인하세요.', 403: 'GitHub 요청 한도에 걸렸어요. 잠시 후 자동으로 다시 시도해요.' }[r.status] || 'GitHub 오류 (' + r.status + ')');
+  }
+  return r.status === 204 ? null : r.json();
+}
+const shared = () => ({ v: 1, seasons: state.seasons, deleted: state.deleted || {}, prefs: { kimpSrc: state.kimpSrc, fxManual: state.fxManual, kimpManual: state.kimpManual, u: state.prefsU || 0 } });
+
+// 항목별로 더 최근에 수정된 쪽을 채택 (동시에 다른 기기에서 입력해도 기록이 사라지지 않게)
+function merge(L, R) {
+  const del = { ...(R.deleted || {}) };
+  for (const [k, u] of Object.entries(L.deleted || {})) del[k] = Math.max(del[k] || 0, u);
+  const pick = (a, b) => !a ? b : !b ? a : ((a.u || 0) > (b.u || 0) ? a : b); // 같으면 원격 우선
+  const rs = R.seasons || [];
+  const ids = [...new Set([...L.seasons.map(s => s.id), ...rs.map(s => s.id)])];
+  const seasons = [];
+  for (const id of ids) {
+    const a = L.seasons.find(s => s.id === id), b = rs.find(s => s.id === id);
+    if ((del['season:' + id] || 0) >= Math.max(a?.u || 0, b?.u || 0)) continue;
+    const records = {};
+    for (const d of new Set([...Object.keys(a?.records || {}), ...Object.keys(b?.records || {})])) {
+      const r = pick(a?.records?.[d], b?.records?.[d]);
+      if ((del[`rec:${id}:${d}`] || 0) < (r.u || 0)) records[d] = r;
+    }
+    const wm = new Map();
+    for (const w of [...(b?.withdrawals || []), ...(a?.withdrawals || [])]) wm.set(w.id, pick(w, wm.get(w.id)));
+    const withdrawals = [...wm.values()].filter(w => (del[`wd:${id}:${w.id}`] || 0) < (w.u || 0));
+    seasons.push({ ...pick(a, b), records, withdrawals });
+  }
+  const prefs = (L.prefs.u || 0) > (R.prefs?.u || 0) ? L.prefs : { ...L.prefs, ...(R.prefs || {}) };
+  return { v: 1, seasons: seasons.length ? seasons : L.seasons, deleted: del, prefs };
+}
+function applyShared(m) {
+  state.seasons = m.seasons; state.deleted = m.deleted;
+  Object.assign(state, { kimpSrc: m.prefs.kimpSrc || state.kimpSrc, fxManual: m.prefs.fxManual ?? null, kimpManual: m.prefs.kimpManual ?? null, prefsU: m.prefs.u || 0 });
+  if (!state.seasons.find(s => s.id === state.active)) state.active = state.seasons[0].id;
+}
+async function findOrCreateGist() {
+  for (let page = 1; page <= 10; page++) {
+    const list = await gh('GET', `/gists?per_page=100&page=${page}`);
+    const hit = list.find(g => g.files && g.files[GFILE]);
+    if (hit) { sync.gistId = hit.id; saveSync(); return; }
+    if (list.length < 100) break;
+  }
+  const g = await gh('POST', '/gists', { description: 'Miracle of 1% 대시보드 데이터 (자동 동기화)', public: false, files: { [GFILE]: { content: canon(shared()) } } });
+  sync.gistId = g.id; saveSync();
+}
+async function syncNow(manual) {
+  if (!sync.token) return;
+  if (syncBusy) { syncAgain = true; return; }
+  syncBusy = true; setSync('busy');
+  try {
+    if (!sync.gistId) await findOrCreateGist();
+    const g = await gh('GET', '/gists/' + sync.gistId);
+    const f = g.files[GFILE];
+    let remote = null;
+    if (f) {
+      const txt = f.truncated ? await (await fetch(f.raw_url, { cache: 'no-store' })).text() : f.content;
+      try { remote = JSON.parse(txt); } catch (e) { }
+    }
+    // GET 이후부터 적용까지는 동기 처리 → 그 사이 로컬 입력이 끼어들지 않음
+    const localStr = canon(shared());
+    const merged = remote ? merge(shared(), remote) : shared();
+    const mStr = canon(merged);
+    if (mStr !== localStr) { applyShared(merged); save(); render(); }
+    if (!remote || mStr !== canon(remote)) await gh('PATCH', '/gists/' + sync.gistId, { files: { [GFILE]: { content: mStr } } });
+    sync.last = Date.now(); saveSync(); syncErr = ''; setSync('ok');
+    if (manual) toast('동기화했어요');
+  } catch (e) {
+    syncErr = e.message || '네트워크 오류'; setSync('err');
+    if (manual) toast(syncErr);
+  }
+  syncBusy = false;
+  if (syncAgain) { syncAgain = false; syncNow(); }
+}
+function scheduleSync() { if (!sync.token) return; clearTimeout(syncTimer); syncTimer = setTimeout(syncNow, 800); }
+function commit() { save(); scheduleSync(); }
+function setSync(st) {
+  syncStatus = st;
+  const c = $('#syncChip');
+  if (st === 'off') { c.hidden = true; } else {
+    c.hidden = false;
+    const t = sync.last ? new Date(sync.last).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }) : '';
+    c.innerHTML = { busy: '<i class="dot busy"></i>동기화 중', ok: `<i class="dot ok"></i>동기화 ${t}`, idle: '<i class="dot"></i>동기화 대기', err: '<i class="dot err"></i>동기화 오류' }[st];
+    c.title = st === 'err' ? syncErr : 'PC·폰 자동 동기화 (GitHub Gist)';
+  }
+  if (settings.open) renderSyncPanel();
+}
+function renderSyncPanel() {
+  const on = !!sync.token;
+  $('#syncOff').hidden = on; $('#syncOn').hidden = !on;
+  if (on) {
+    $('#syncInfo').innerHTML = syncStatus === 'err'
+      ? `<span class="ng">${esc(syncErr)}</span>`
+      : `연결됨 · ${sync.last ? '마지막 동기화 ' + new Date(sync.last).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '첫 동기화 대기 중'}${sync.gistId ? ` · <a href="https://gist.github.com/${sync.gistId}" target="_blank" rel="noopener">저장소 보기</a>` : ''}`;
+  }
+}
+async function connectSync() {
+  const t = $('#syncToken').value.trim();
+  if (!t) { $('#syncToken').focus(); return toast('토큰을 붙여넣으세요.'); }
+  sync = { token: t }; saveSync();
+  $('#syncConnect').disabled = true;
+  try { await gh('GET', '/user'); }
+  catch (e) { sync = {}; saveSync(); $('#syncConnect').disabled = false; setSync('off'); renderSyncPanel(); return toast(e.message); }
+  $('#syncConnect').disabled = false; $('#syncToken').value = '';
+  setSync('idle'); renderSyncPanel();
+  await syncNow(true);
+}
+$('#syncConnect').onclick = connectSync;
+$('#syncToken').addEventListener('keydown', e => { if (e.key === 'Enter') connectSync(); });
+$('#syncNowBtn').onclick = () => syncNow(true);
+$('#syncOffBtn').onclick = () => { if (!confirm('이 기기의 동기화 연결을 해제할까요? (데이터는 이 기기와 GitHub에 그대로 남아요)')) return; sync = {}; saveSync(); setSync('off'); renderSyncPanel(); };
+$('#syncChip').onclick = () => { openSettings(); setTimeout(() => $('#syncSec').scrollIntoView({ block: 'start' }), 50); };
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') syncNow(); });
+setInterval(() => { if (document.visibilityState === 'visible') syncNow(); }, 30000);
+
+/* ---------- 기타 ---------- */
+let toastT;
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2200); }
+function applyTheme() { if (state.theme === 'auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.dataset.theme = state.theme; $('#themeBtn').title = '테마: ' + { auto: '시스템', light: '라이트', dark: '다크' }[state.theme]; }
+
+/* ---------- 이벤트 ---------- */
+$('#inDate').addEventListener('change', e => loadEntry(e.target.value));
+['#inBal', '#inFlow'].forEach(s => $(s).addEventListener('input', renderPreview));
+['#inBal', '#inFlow', '#inNote'].forEach(s => $(s).addEventListener('keydown', e => { if (e.key === 'Enter') saveEntry(); }));
+$('#saveBtn').onclick = saveEntry;
+$('#flowToggle').onclick = () => { $('#flowBox').hidden = false; $('#flowToggle').hidden = true; $('#inFlow').focus(); };
+$('#refreshBtn').onclick = fetchMarket;
+$('#themeBtn').onclick = () => { state.theme = { auto: 'light', light: 'dark', dark: 'auto' }[state.theme]; save(); applyTheme(); renderCharts(); };
+$('#settingsBtn').onclick = openSettings;
+$('#saveSettings').onclick = saveSettings;
+$('#sGoal').addEventListener('input', e => { $('#sGoalHint').textContent = krwShort(parseGoal(e.target.value)); });
+$('#seasonSel').onchange = e => { state.active = e.target.value; save(); loadEntry(todayS()); render(); };
+$('#rangeSeg').onclick = e => { const b = e.target.closest('button'); if (!b) return; range = b.dataset.r; $('#rangeSeg').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); if (range === 'plan' && !logScale) { logScale = true; $('#logChk').checked = true; } renderBal(); };
+$('#logChk').onchange = e => { logScale = e.target.checked; renderBal(); };
+$('#ledgerSeg').onclick = e => { const b = e.target.closest('button'); if (!b) return; ledgerMode = b.dataset.m; $('#ledgerSeg').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); renderLedger(S(), eff()); };
+$('#ledger').onclick = e => {
+  const del = e.target.closest('[data-del]');
+  if (del) { const d = del.dataset.del; if (confirm(`${longD(d)} 기록을 삭제할까요?`)) { delete S().records[d]; state.deleted[`rec:${S().id}:${d}`] = Date.now(); commit(); render(); if ($('#inDate').value === d) loadEntry(d); } return; }
+  const tr = e.target.closest('tr[data-d]'); if (!tr) return;
+  loadEntry(tr.dataset.d); window.scrollTo({ top: 0, behavior: 'smooth' }); $('#inBal').focus();
+};
+$('#newSeasonBtn').onclick = () => {
+  const s = S(), id = 's' + Date.now(), nm = prompt('새 시즌 이름', ((parseInt(s.name) || 0) + 1) + '회차'); if (!nm) return;
+  state.seasons.push({ id, name: nm, start: todayS(), principal: C.last ? C.last.bal : s.principal, rate: s.rate, days: s.days, goalKRW: s.goalKRW, records: {}, withdrawals: [], u: Date.now() });
+  state.active = id; commit(); openSettings(); render();
+};
+$('#delSeasonBtn').onclick = () => {
+  if (state.seasons.length < 2) return toast('마지막 시즌은 삭제할 수 없어요.');
+  const s = S(); if (!confirm(`"${s.name}" 시즌과 기록 ${Object.keys(s.records).length}개를 삭제할까요?`)) return;
+  state.seasons = state.seasons.filter(x => x !== s); state.deleted['season:' + s.id] = Date.now(); state.active = state.seasons[0].id; commit(); settings.close(); loadEntry(todayS()); render();
+};
+$('#exportBtn').onclick = () => {
+  const b = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' }), a = document.createElement('a');
+  a.href = URL.createObjectURL(b); a.download = `miracle1_backup_${todayS().replace(/-/g, '')}.json`; a.click(); URL.revokeObjectURL(a.href);
+};
+$('#importBtn').onclick = () => $('#jsonFile').click();
+$('#jsonFile').onchange = async e => {
+  const f = e.target.files[0]; if (!f) return;
+  try { const d = JSON.parse(await f.text()); if (!Array.isArray(d.seasons)) throw new Error('형식 오류'); if (!confirm('현재 데이터를 백업 파일로 교체할까요?')) return; state = d; state.deleted ||= {}; fromLS = true; stampAll(Date.now(), true); state.prefsU = Date.now(); commit(); settings.close(); applyTheme(); loadEntry(todayS()); render(); toast('백업을 불러왔어요'); }
+  catch (err) { toast('백업 파일을 읽지 못했어요.'); }
+  e.target.value = '';
+};
+$('#xlsxBtn').onclick = () => $('#xlsxFile').click();
+$('#xlsxFile').onchange = e => { const f = e.target.files[0]; if (f) onXlsx(f); e.target.value = ''; };
+$('#xlsxSheet').onchange = previewSheet;
+$('#xlsxGo').onclick = importSheet;
+let rz; new ResizeObserver(() => { clearTimeout(rz); rz = setTimeout(renderCharts, 80); }).observe($('.wrap'));
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', renderCharts);
+
+/* ---------- 시작 ---------- */
+applyTheme();
+loadEntry(todayS());
+render();
+fetchMarket();
+setInterval(fetchMarket, 60000);
+setSync(syncStatus);
+syncNow();
+</script>
+</body>
+</html>
