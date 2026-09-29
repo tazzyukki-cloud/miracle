@@ -2,11 +2,16 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Miracle of 1%</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Miracle of Compounding</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Miracle 1%">
+<meta name="apple-mobile-web-app-title" content="Compounding">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#070c1a">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
 :root{
@@ -48,10 +53,12 @@ button,input,select{font:inherit;color:inherit}
 .card,.kpi{min-width:0}
 
 /* header */
-header{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+header{position:sticky;top:0;padding-top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
 .hdr{max-width:1200px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:10px;margin-right:auto}
-.brand h1{font-size:16px;margin:0;font-weight:700;letter-spacing:-.01em}
+.brand{flex-wrap:wrap}
+.brand h1{font-size:16px;margin:0;font-weight:700;letter-spacing:-.01em;display:flex;align-items:center;gap:8px}
+.brand h1 img{width:26px;height:26px;border-radius:7px}
 .brand select{border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:4px 8px;font-weight:600}
 .chips{display:flex;gap:6px;flex-wrap:wrap}
 .chip{display:flex;align-items:baseline;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:4px 12px;font-size:13px;white-space:nowrap}
@@ -217,7 +224,7 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
 <header>
   <div class="hdr">
     <div class="brand">
-      <h1>Miracle of 1%</h1>
+      <h1><img src="icon-192.png" alt="" onerror="this.remove()">Miracle of Compounding</h1>
       <select id="seasonSel" aria-label="시즌 선택"></select>
       <div class="hbtns">
         <button class="hbtn" id="guideBtn" title="가이드대로 매일 얼마씩 벌어야 하는지"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>가이드</button>
@@ -394,7 +401,7 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD = '20260929222202'; // 게시할 때 publish.sh가 시각으로 바꿈
+const BUILD = '20260929222703'; // 게시할 때 publish.sh가 시각으로 바꿈
 /* ---------- 유틸 ---------- */
 const $ = s => document.querySelector(s);
 const DAY = 86400000;
@@ -1044,7 +1051,7 @@ async function findOrCreateGist() {
     if (hit) { sync.gistId = hit.id; saveSync(); return; }
     if (list.length < 100) break;
   }
-  const g = await gh('POST', '/gists', { description: 'Miracle of 1% 대시보드 데이터 (자동 동기화)', public: false, files: { [GFILE]: { content: canon(shared()) } } });
+  const g = await gh('POST', '/gists', { description: 'Miracle of Compounding 대시보드 데이터 (자동 동기화)', public: false, files: { [GFILE]: { content: canon(shared()) } } });
   sync.gistId = g.id; saveSync();
 }
 async function syncNow(manual) {
@@ -1126,7 +1133,7 @@ async function checkUpdate() {
   if (!/^https?:/.test(location.protocol) || BUILD === 'dev') return;
   try {
     const txt = await (await fetch(location.pathname + '?_=' + Date.now(), { cache: 'no-store' })).text();
-    const b = (txt.match(/const BUILD = '20260929222202']+)'/) || [])[1];
+    const b = (txt.match(/const BUILD = '20260929222703']+)'/) || [])[1];
     if (!b || b === BUILD) return;
     if (isDirty()) $('#updBar').hidden = false; else location.reload();
   } catch (e) { }
