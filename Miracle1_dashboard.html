@@ -401,7 +401,7 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD = '20260929222703'; // 게시할 때 publish.sh가 시각으로 바꿈
+const BUILD = '20260929223030'; // 게시할 때 publish.sh가 시각으로 바꿈
 /* ---------- 유틸 ---------- */
 const $ = s => document.querySelector(s);
 const DAY = 86400000;
@@ -1133,7 +1133,7 @@ async function checkUpdate() {
   if (!/^https?:/.test(location.protocol) || BUILD === 'dev') return;
   try {
     const txt = await (await fetch(location.pathname + '?_=' + Date.now(), { cache: 'no-store' })).text();
-    const b = (txt.match(/const BUILD = '20260929222703']+)'/) || [])[1];
+    const b = (txt.match(new RegExp('^const BUI' + "LD = '([^']+)';", 'm')) || [])[1];
     if (!b || b === BUILD) return;
     if (isDirty()) $('#updBar').hidden = false; else location.reload();
   } catch (e) { }
