@@ -406,7 +406,7 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD = '20260929225525'; // 게시할 때 publish.sh가 시각으로 바꿈
+const BUILD = '20260929230255'; // 게시할 때 publish.sh가 시각으로 바꿈
 /* ---------- 유틸 ---------- */
 const $ = s => document.querySelector(s);
 const DAY = 86400000;
@@ -616,14 +616,25 @@ function renderKPIs(s, e) {
     if (L && C.geo > 0) { const d = addD(L.date, Math.ceil(Math.log(goalUSD / cur) / Math.log(1 + C.geo))); rows += row(`현재 페이스 ${pct(C.geo, 2, false)}`, dayN(s, d), d); }
     else rows += '<div class="kr"><span>현재 페이스</span><span class="muted">기록이 더 필요해요</span></div>';
     const baseD = L ? L.date : addD(s.start, -1), d2 = addD(baseD, Math.ceil(Math.log(goalUSD / cur) / Math.log(1 + s.rate))), n2 = dayN(s, d2), diff = gN - n2;
-    rows += row(`지금부터 ${pct(s.rate, 1, false)}씩${L && diff ? ` <span class="badge ${diff > 0 ? 'good' : 'warn'}">${Math.abs(diff)}일 ${diff > 0 ? '빠름' : '늦음'}</span>` : ''}`, n2, d2);
+    rows += row(`지금부터 ${pct(s.rate, 1, false)}씩`, n2, d2);
     rows += row('처음 가이드', gN, dateOf(s, gN), gN > s.days ? ' · 플랜 초과' : '', true);
   }
   rows += `<div class="kr muted"><span>금액 기준</span><span>${krwShort(toKRW(cur, e))} / ${krwShort(s.goalKRW)} (${(prog * 100).toFixed(prog < .01 ? 3 : 1)}%)</span></div>`;
   out.push(kpi(`졸업 목표 ${krwShort(s.goalKRW)} <span class="muted">일수 기준 달성률</span>`, `${(dayProg * 100).toFixed(1)}%`, `<div class="krs">${rows}</div>`, `<div class="bar"><i style="width:${Math.max(dayProg * 100, .5)}%"></i></div>`));
   // 졸업일
   const left = diffD(t, end), dprog = Math.min(1, Math.max(0, (tn - 1) / s.days));
-  out.push(kpi(`졸업 예정일 <span class="muted">${s.days}일 플랜</span>`, left >= 0 ? `D-${left}` : `D+${-left}`, `${longD(end)} · 가이드 ${usdShort(guide(s, s.days))}`, `<div class="bar"><i style="width:${Math.max(dprog * 100, .5)}%"></i></div>`));
+  // 지금 기준: 현재 잔고에서 매일 목표수익률로 가면 목표금액에 도달하는 날
+  const dd = n => n >= 0 ? `D-${n}` : `D+${-n}`, sdt = d => { const [y, m, x] = d.split('-'); return `${y.slice(2)}.${+m}.${+x}`; };
+  let nowEnd, nowRow, gradBadge = '';
+  if (cur >= goalUSD) { nowEnd = L ? L.date : t; nowRow = `<div class="kr"><span>지금 기준</span><b class="ok">목표 달성!</b></div>`; }
+  else {
+    nowEnd = addD(L ? L.date : addD(s.start, -1), Math.ceil(Math.log(goalUSD / cur) / Math.log(1 + s.rate)));
+    const early = diffD(nowEnd, end);
+    if (L && early) gradBadge = `<span class="badge ${early > 0 ? 'good' : 'warn'}">가이드보다 ${Math.abs(early)}일 ${early > 0 ? '빠름' : '늦음'}</span>`;
+    nowRow = `<div class="kr"><span>지금 기준 <span class="muted">${pct(s.rate, 1, false)}씩</span></span><span><b>${dd(diffD(t, nowEnd))}</b> · ${sdt(nowEnd)}</span></div>`;
+  }
+  const gradRows = `<div class="krs">${nowRow}<div class="kr muted"><span>가이드 기준 <span class="muted">${s.days}일</span></span><span><b>${dd(left)}</b> · ${sdt(end)}</span></div></div>`;
+  out.push(kpi(`졸업 예정일 ${gradBadge || '<span class="muted">지금 기준</span>'}`, dd(diffD(t, nowEnd)), gradRows, `<div class="bar"><i style="width:${Math.max(dprog * 100, .5)}%"></i></div>`));
   $('#kpis').innerHTML = out.join('');
 }
 function renderStats(s) {
