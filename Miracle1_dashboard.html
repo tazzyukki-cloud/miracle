@@ -406,7 +406,7 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD = '20260929225154'; // 게시할 때 publish.sh가 시각으로 바꿈
+const BUILD = '20260929225525'; // 게시할 때 publish.sh가 시각으로 바꿈
 /* ---------- 유틸 ---------- */
 const $ = s => document.querySelector(s);
 const DAY = 86400000;
@@ -607,8 +607,11 @@ function renderKPIs(s, e) {
   // 목표금액 도달 예측 3가지: 현재 페이스 / 지금 잔고에서 목표율 / 처음 가이드
   const sd = d => { const [y, m, dd] = d.split('-'); return `${y.slice(2)}.${+m}.${+dd}`; };
   const row = (label, n, d, extra = '', muted = false) => `<div class="kr${muted ? ' muted' : ''}"><span>${label}</span><span><b>${n}일차</b> · ${sd(d)}${extra}</span></div>`;
-  let rows = '';
-  if (cur >= goalUSD) rows = '<div class="kr"><span>목표 금액</span><b class="ok">달성!</b></div>';
+  // 일수 기준 달성률: 현재 잔고 = 원금을 목표율로 며칠 불린 금액인지 → 졸업일수 중 며칠 달성
+  const eqDays = Math.max(0, Math.log(cur / s.principal) / Math.log(1 + s.rate));
+  const dayProg = Math.min(1, eqDays / gN);
+  let rows = `<div class="kr"><span>복리 일수 달성</span><span><b>${eqDays.toFixed(1)}일</b> / ${gN}일</span></div>`;
+  if (cur >= goalUSD) rows += '<div class="kr"><span>목표 금액</span><b class="ok">달성!</b></div>';
   else {
     if (L && C.geo > 0) { const d = addD(L.date, Math.ceil(Math.log(goalUSD / cur) / Math.log(1 + C.geo))); rows += row(`현재 페이스 ${pct(C.geo, 2, false)}`, dayN(s, d), d); }
     else rows += '<div class="kr"><span>현재 페이스</span><span class="muted">기록이 더 필요해요</span></div>';
@@ -616,7 +619,8 @@ function renderKPIs(s, e) {
     rows += row(`지금부터 ${pct(s.rate, 1, false)}씩${L && diff ? ` <span class="badge ${diff > 0 ? 'good' : 'warn'}">${Math.abs(diff)}일 ${diff > 0 ? '빠름' : '늦음'}</span>` : ''}`, n2, d2);
     rows += row('처음 가이드', gN, dateOf(s, gN), gN > s.days ? ' · 플랜 초과' : '', true);
   }
-  out.push(kpi(`졸업 목표 ${krwShort(s.goalKRW)} <span class="muted">도달 예측</span>`, `${(prog * 100).toFixed(prog < .01 ? 3 : 1)}%`, `<div class="krs">${rows}</div>`, `<div class="bar"><i style="width:${Math.max(prog * 100, .5)}%"></i></div>`));
+  rows += `<div class="kr muted"><span>금액 기준</span><span>${krwShort(toKRW(cur, e))} / ${krwShort(s.goalKRW)} (${(prog * 100).toFixed(prog < .01 ? 3 : 1)}%)</span></div>`;
+  out.push(kpi(`졸업 목표 ${krwShort(s.goalKRW)} <span class="muted">일수 기준 달성률</span>`, `${(dayProg * 100).toFixed(1)}%`, `<div class="krs">${rows}</div>`, `<div class="bar"><i style="width:${Math.max(dayProg * 100, .5)}%"></i></div>`));
   // 졸업일
   const left = diffD(t, end), dprog = Math.min(1, Math.max(0, (tn - 1) / s.days));
   out.push(kpi(`졸업 예정일 <span class="muted">${s.days}일 플랜</span>`, left >= 0 ? `D-${left}` : `D+${-left}`, `${longD(end)} · 가이드 ${usdShort(guide(s, s.days))}`, `<div class="bar"><i style="width:${Math.max(dprog * 100, .5)}%"></i></div>`));
