@@ -316,8 +316,8 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
       <label>시작일 (1일차)<input type="date" id="sStart"></label>
       <label>원금 (USD)<input id="sPrincipal" inputmode="decimal"></label>
       <label>일 목표수익률 (%)<input id="sRate" inputmode="decimal"></label>
-      <label>플랜 일수 (졸업일)<input id="sDays" inputmode="numeric"></label>
       <label>졸업 목표금액 (원)<input id="sGoal" inputmode="numeric"><span class="hint" id="sGoalHint"></span></label>
+      <label><span>졸업일수 <span class="muted">· 자동 계산</span></span><input id="sDays" readonly tabindex="-1" style="background:var(--surface-2);font-weight:600"><span class="hint" id="sDaysHint"></span></label>
     </div>
     <div class="btnrow"><button class="btn sm" id="newSeasonBtn">+ 새 시즌 만들기</button><button class="btn sm danger" id="delSeasonBtn">이 시즌 삭제</button></div>
 
@@ -401,7 +401,7 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD = '20260929223030'; // 게시할 때 publish.sh가 시각으로 바꿈
+const BUILD = '20260929223932'; // 게시할 때 publish.sh가 시각으로 바꿈
 /* ---------- 유틸 ---------- */
 const $ = s => document.querySelector(s);
 const DAY = 86400000;
@@ -826,6 +826,7 @@ function openSettings() {
   $('#sName').value = s.name; $('#sStart').value = s.start; $('#sPrincipal').value = s.principal;
   $('#sRate').value = +(s.rate * 100).toFixed(4); $('#sDays').value = s.days; $('#sGoal').value = s.goalKRW.toLocaleString('ko-KR');
   $('#sGoalHint').textContent = krwShort(s.goalKRW);
+  calcDays();
   $('#kSrc').value = state.kimpSrc; $('#fxMan').value = state.fxManual ?? ''; $('#kMan').value = state.kimpManual != null ? +(state.kimpManual * 100).toFixed(4) : '';
   $('#xlsxPanel').hidden = true;
   renderSyncPanel();
@@ -833,7 +834,7 @@ function openSettings() {
 }
 function saveSettings() {
   const s = S();
-  const p = num($('#sPrincipal').value), r = num($('#sRate').value), d = parseInt($('#sDays').value), g = parseGoal($('#sGoal').value);
+  const p = num($('#sPrincipal').value), r = num($('#sRate').value), d = calcDays(), g = parseGoal($('#sGoal').value);
   if (!(p > 0) || !(r > 0) || !(d > 0) || !(g > 0) || !$('#sStart').value) return toast('시즌 값을 확인하세요.');
   Object.assign(s, { name: $('#sName').value.trim() || s.name, start: $('#sStart').value, principal: p, rate: r / 100, days: d, goalKRW: g, u: Date.now() });
   state.kimpSrc = $('#kSrc').value; state.prefsU = Date.now();
@@ -1158,6 +1159,17 @@ $('#themeBtn').onclick = () => { state.theme = { auto: 'light', light: 'dark', d
 $('#settingsBtn').onclick = openSettings;
 $('#saveSettings').onclick = saveSettings;
 $('#sGoal').addEventListener('input', e => { $('#sGoalHint').textContent = krwShort(parseGoal(e.target.value)); });
+// 졸업일수 = 가이드 잔고가 목표금액(현재 환율·김프로 달러 환산)에 처음 도달하는 날
+function calcDays() {
+  const p = num($('#sPrincipal').value), r = num($('#sRate').value) / 100, g = parseGoal($('#sGoal').value), st = $('#sStart').value, e = eff();
+  if (!(p > 0) || !(r > 0) || !(g > 0)) { $('#sDays').value = ''; $('#sDaysHint').textContent = '원금·수익률·목표금액을 넣으면 계산돼요'; return NaN; }
+  const goalUSD = g / (e.fx * (1 + e.kimp));
+  const n = Math.max(1, Math.ceil(Math.log(goalUSD / p) / Math.log(1 + r)));
+  $('#sDays').value = n + '일';
+  $('#sDaysHint').textContent = `${st ? '졸업 ' + longD(addD(st, n - 1)) + ' · ' : ''}목표 ${usd(goalUSD, 0)} (환율 ${e.fx.toFixed(0)}, 김프 ${pct(e.kimp)} 기준)`;
+  return n;
+}
+['#sPrincipal', '#sRate', '#sGoal', '#sStart'].forEach(x => $(x).addEventListener('input', calcDays));
 $('#seasonSel').onchange = e => { state.active = e.target.value; save(); loadEntry(todayS()); render(); };
 $('#rangeSeg').onclick = e => { const b = e.target.closest('button'); if (!b) return; range = b.dataset.r; $('#rangeSeg').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); if (range === 'plan' && !logScale) { logScale = true; $('#logChk').checked = true; } renderBal(); };
 $('#logChk').onchange = e => { logScale = e.target.checked; renderBal(); };
