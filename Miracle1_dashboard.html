@@ -406,7 +406,7 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD = '20260929224803'; // 게시할 때 publish.sh가 시각으로 바꿈
+const BUILD = '20260929225154'; // 게시할 때 publish.sh가 시각으로 바꿈
 /* ---------- 유틸 ---------- */
 const $ = s => document.querySelector(s);
 const DAY = 86400000;
@@ -593,7 +593,14 @@ function renderKPIs(s, e) {
   // 오늘 목표
   const gT = guide(s, Math.max(tn, 0));
   const base = L ? L.bal : s.principal;
-  out.push(kpi(`오늘 목표 <span class="muted">${tn >= 1 ? tn + '일차' : '시작 전'}</span>`, usd(gT), `${krwShort(toKRW(gT, e))} · 최근 잔고 대비 <span class="${cls(gT / base - 1)}">${pct(gT / base - 1)}</span> 필요`));
+  // 현재 잔고가 오늘 가이드 잔고보다 많으면 초과, 적으면 미달
+  const over = base >= gT, gap = base - gT;
+  const todayRows = `<div class="krs">
+    <div class="kr"><span>원화</span><span>${krwShort(toKRW(gT, e))}</span></div>
+    <div class="kr"><span>${L ? '현재 잔고' : '원금'} ${usd(base)}</span><span class="badge ${over ? 'good' : 'warn'}">${over ? '초과' : '미달'} ${usd(Math.abs(gap))} (${over ? '+' : '−'}${Math.abs((base / gT - 1) * 100).toFixed(2)}%)</span></div>
+    ${over ? '' : `<div class="kr"><span>목표까지</span><span><b>+${usd(-gap)}</b> (+${((gT / base - 1) * 100).toFixed(2)}%) 필요</span></div>`}
+  </div>`;
+  out.push(kpi(`오늘 목표 <span class="muted">${tn >= 1 ? tn + '일차' : '시작 전'}</span>`, usd(gT), todayRows));
   // 졸업 목표 금액
   const cur = L ? L.bal : s.principal, prog = Math.min(1, toKRW(cur, e) / s.goalKRW);
   const gN = Math.ceil(Math.log(goalUSD / s.principal) / Math.log(1 + s.rate));
