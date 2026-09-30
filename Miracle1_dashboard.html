@@ -133,6 +133,19 @@ tr.editing td{background:var(--accent-soft)!important}
 section{margin-top:16px}
 
 /* entry */
+.entry-head{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:8px;width:100%;cursor:default;font-size:14px;font-weight:650;margin-bottom:4px}
+.entry-head .sub{font-weight:400;color:var(--text-3);font-size:12px;margin-left:auto}
+.entry-head .chev{display:none;width:20px;height:20px;color:var(--text-2);transition:transform .2s}
+.entry-sum{display:none}
+@media (max-width:900px){
+  .entry-head{cursor:pointer;margin:0}
+  .entry-head:focus-visible{outline:2px solid var(--accent);outline-offset:6px;border-radius:6px}
+  .entry-head .chev{display:block}
+  .entry.open .entry-head .chev{transform:rotate(180deg)}
+  .entry:not(.open) .entry-body{display:none}
+  .entry:not(.open) .entry-sum{cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:10px;font-size:13px;color:var(--text-2)}
+  .entry.open .entry-head{margin-bottom:4px}
+}
 .entry label{display:block;font-size:12px;color:var(--text-2);margin:10px 0 4px}
 .field{display:flex;align-items:center;border:1px solid var(--border);border-radius:10px;background:var(--surface);padding:0 12px;transition:border-color .15s}
 .field:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
@@ -264,7 +277,12 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
   <div class="grid-top">
     <!-- 입력 -->
     <div class="card entry">
-      <h2>실적 입력 <span class="sub" id="entryDay"></span></h2>
+      <button class="entry-head" id="entryToggle" aria-expanded="false" aria-controls="entryBody">
+        <span class="eh-title">실적 입력</span><span class="sub" id="entryDay"></span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div class="entry-sum num" id="entrySum"></div>
+      <div class="entry-body" id="entryBody">
       <label for="inDate">날짜</label>
       <div class="field"><input type="date" id="inDate"></div>
       <label for="inBal">잔고 (USD)</label>
@@ -279,6 +297,7 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
       <div class="preview num" id="preview"></div>
       <button class="btn primary block" id="saveBtn">저장</button>
       <div class="status" id="entryStatus"></div>
+      </div>
     </div>
 
     <!-- KPI -->
@@ -420,7 +439,7 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD = '20260930230809'; // 게시할 때 publish.sh가 시각으로 바꿈
+const BUILD = '20260930232051'; // 게시할 때 publish.sh가 시각으로 바꿈
 /* ---------- 유틸 ---------- */
 const $ = s => document.querySelector(s);
 const DAY = 86400000;
@@ -720,6 +739,11 @@ function renderPreview() {
   const s = S(), d = $('#inDate').value || todayS(), n = dayN(s, d), g = guide(s, n);
   const exists = !!s.records[d];
   $('#entryDay').textContent = n >= 1 ? `${n}일차${n > s.days ? ' · 플랜 이후' : ''}` : '시작일 이전';
+  // 접힌 상태(모바일)에서 보이는 오늘 입력 요약
+  const tr = s.records[todayS()];
+  $('#entrySum').innerHTML = tr
+    ? `<span>오늘 <b>${usd(tr.bal)}</b> 입력됨</span><span class="badge good">✓ 완료</span>`
+    : `<span>오늘 잔고를 아직 입력하지 않았어요</span><span class="badge warn">입력하기</span>`;
   $('#saveBtn').textContent = exists ? '수정 저장' : '저장';
   const bal = num($('#inBal').value), flow = num($('#inFlow').value) || 0;
   const p = prevRecordBefore(s, d), pb = p ? p.bal : s.principal;
@@ -743,9 +767,17 @@ function saveEntry() {
   s.records[d] = { bal, flow, note, fx: e.fx, kimp: e.kimp, u: Date.now() };
   commit(); render();
   $('#entryStatus').textContent = `${longD(d)} ${existed ? '수정됨' : '저장됨'} · ${usd(bal)}`;
+  setEntryOpen(false);
   toast(existed ? '수정했어요' : '저장했어요');
 }
 
+// 모바일에서는 실적 입력 카드를 접어 두고, 머리글을 누르면 펼침 (PC는 항상 펼침)
+function setEntryOpen(open, focus) {
+  const c = $('.entry'); c.classList.toggle('open', open); $('#entryToggle').setAttribute('aria-expanded', open);
+  if (open && focus) { window.scrollTo({ top: 0, behavior: 'smooth' }); setTimeout(() => $('#inBal').focus(), 250); }
+}
+$('#entryToggle').onclick = () => { if (matchMedia('(max-width:900px)').matches) setEntryOpen(!$('.entry').classList.contains('open'), true); };
+$('#entrySum').onclick = () => setEntryOpen(true, true);
 /* ---------- 차트 ---------- */
 const SVGNS = 'http://www.w3.org/2000/svg';
 function niceTicks(lo, hi, count = 5) {
@@ -863,7 +895,7 @@ function renderRet() {
       tip.style.left = (px + 14 + tw > rect.width ? px - tw - 14 : px + 14) + 'px'; tip.style.top = '10px';
     };
     h.addEventListener('pointerenter', show); h.addEventListener('pointerdown', show);
-    h.addEventListener('click', () => { loadEntry(rows[+h.dataset.i].date); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    h.addEventListener('click', () => { loadEntry(rows[+h.dataset.i].date); setEntryOpen(true, true); });
   });
   el.querySelector('svg').addEventListener('pointerleave', () => { tip.style.opacity = 0; hl.style.display = 'none'; });
 }
@@ -1220,7 +1252,7 @@ $('#ledger').onclick = e => {
   const del = e.target.closest('[data-del]');
   if (del) { const d = del.dataset.del; if (confirm(`${longD(d)} 기록을 삭제할까요?`)) { delete S().records[d]; state.deleted[`rec:${S().id}:${d}`] = Date.now(); commit(); render(); if ($('#inDate').value === d) loadEntry(d); } return; }
   const tr = e.target.closest('tr[data-d]'); if (!tr) return;
-  loadEntry(tr.dataset.d); window.scrollTo({ top: 0, behavior: 'smooth' }); $('#inBal').focus();
+  loadEntry(tr.dataset.d); setEntryOpen(true, true);
 };
 $('#newSeasonBtn').onclick = () => {
   const s = S(), id = 's' + Date.now(), nm = prompt('새 시즌 이름', ((parseInt(s.name) || 0) + 1) + '회차'); if (!nm) return;
