@@ -83,14 +83,29 @@ button.chip{cursor:pointer;font:inherit;font-size:12.5px;color:var(--text-2);ali
 .hbtn svg{width:16px;height:16px;color:var(--accent)}
 .hbtn .cnt{font-size:11px;font-weight:600;color:var(--text-2);background:var(--surface-2);border-radius:99px;padding:0 6px}
 .hbtn .cnt:empty{display:none}
-dialog.wide{width:min(1280px,calc(100vw - 24px));max-width:none;height:calc(100vh - 24px);max-height:none;flex-direction:column}
+dialog.wide{width:min(1280px,calc(100vw - 24px));max-width:none;height:calc(100vh - 24px);height:calc(100dvh - 24px);max-height:none;flex-direction:column}
 dialog.wide[open]{display:flex}
 dialog.wide .dlg-b{flex:1;min-height:0;max-height:none;display:flex;flex-direction:column;overflow:hidden;padding-bottom:16px}
 dialog.wide .tblwrap{flex:1;min-height:0;max-height:none!important}
 dialog.wide table{font-size:13.5px}
 @media (max-height:700px){dialog.wide .dlg-b{overflow:auto}dialog.wide .tblwrap{flex:none;height:70vh}}
 .sumgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:16px 0}
-@media (max-width:700px){.sumgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+#guideTbl .ds,#guideTbl .mo{display:none}
+#guideTbl .mo{font-size:11.5px;color:var(--text-3);font-weight:400}
+@media (max-width:700px){
+  .sumgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0 12px}
+  .sum{padding:9px 11px;border-radius:10px}
+  .sum .k{font-size:11.5px}
+  .sum .v{font-size:16px}
+  .sum .s{font-size:11px;line-height:1.35}
+  dialog.wide .dlg-b{padding:0 12px 12px}
+  dialog.wide .dlg-h{padding:12px 16px}
+  #guideTbl .hm{display:none}
+  #guideTbl .dl{display:none}
+  #guideTbl .ds,#guideTbl .mo{display:block}
+  #guideTbl table{font-size:13px}
+  #guideTbl th,#guideTbl td{padding:7px 8px}
+}
 .sum{background:var(--surface-2);border-radius:12px;padding:12px 14px;min-width:0}
 .sum .k{font-size:12px;color:var(--text-2)}
 .sum .v{font-size:19px;font-weight:700;letter-spacing:-.01em;margin-top:2px;overflow-wrap:anywhere}
@@ -379,7 +394,6 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
   <div class="dlg-h"><h3>가이드 플랜 <span class="muted" style="font-weight:400;font-size:13px" id="guideSub"></span></h3><button class="iconbtn" style="margin-left:auto" onclick="guideDlg.close()" title="닫기">✕</button></div>
   <div class="dlg-b">
     <div class="sumgrid num" id="guideSum"></div>
-    <div class="miles num" id="guideMiles"></div>
     <div class="chart-head"><h2>일자별 목표 수익</h2><div class="seg" id="guideSeg"><button data-m="rest" class="on">오늘부터</button><button data-m="all">전체</button></div></div>
     <div class="tblwrap" id="guideTbl"></div>
   </div>
@@ -406,7 +420,7 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD = '20260929230255'; // 게시할 때 publish.sh가 시각으로 바꿈
+const BUILD = '20260930230809'; // 게시할 때 publish.sh가 시각으로 바꿈
 /* ---------- 유틸 ---------- */
 const $ = s => document.querySelector(s);
 const DAY = 86400000;
@@ -948,21 +962,14 @@ function renderGuide() {
     <div class="sum"><div class="k">내 잔고 기준 오늘 목표</div><div class="v">+${usd(needMine)}</div><div class="s">${usd(bal)} × ${pct(s.rate, 1, false)} ≈ ${krwShort(toKRW(needMine, e))}</div></div>
     <div class="sum"><div class="k">오늘 가이드 잔고</div><div class="v">${usd(gToday)}</div><div class="s">${gap > 0 ? `따라잡으려면 <b class="up">+${usd(gap)}</b> (${pct(gap / bal)})` : `가이드보다 <b class="ok">${usd(-gap)}</b> 여유`}</div></div>
     <div class="sum"><div class="k">앞으로 7일 목표 수익</div><div class="v">+${usd(week)}</div><div class="s">≈ ${krwShort(toKRW(week, e))} · ${md(dateOf(s, tn))}~${md(dateOf(s, wEnd))}</div></div>`;
-  // 원화 마일스톤: 가이드대로 가면 언제 도달하는지
-  const k = e.fx * (1 + e.kimp), curKRW = bal * k;
-  const targets = [...new Set([1e8, 3e8, 5e8, 1e9, 3e9, s.goalKRW])].filter(v => v <= s.goalKRW).sort((a, b) => a - b);
-  $('#guideMiles').innerHTML = targets.map(v => {
-    const n = Math.max(1, Math.ceil(Math.log(v / k / s.principal) / Math.log(1 + s.rate)));
-    const done = curKRW >= v;
-    return `<span class="mile ${done ? 'done' : ''}">${done ? '✓ ' : ''}<b>${krwShort(v)}</b> · ${n}일차 (${dateOf(s, n).slice(2).replace(/-/g, '.')})${n > s.days ? ' 플랜 이후' : ''}</span>`;
-  }).join('');
   const from = guideMode === 'all' ? 1 : tn, rows = [];
   for (let n = from; n <= s.days; n++) {
     const d = dateOf(s, n), g0 = guide(s, n - 1), g1 = guide(s, n), r = C.by[d];
     const res = r ? (r.bal >= g1 ? `<span class="ok">✓ ${usd(r.bal)}</span>` : `<span class="ng">✗ ${usd(r.bal)}</span>`) : (d < t ? '<span class="muted">미입력</span>' : '');
-    rows.push(`<tr class="${d === t ? 'today' : ''}"><td>${n}</td><td>${longD(d)}</td><td class="muted">${usd(g0)}</td><td><b class="up">+${usd(g1 - g0)}</b></td><td>${krwShort(toKRW(g1 - g0, e))}</td><td><b>${usd(g1)}</b></td><td>${krwShort(toKRW(g1, e))}</td><td class="muted">×${(g1 / s.principal).toLocaleString('en-US', { maximumFractionDigits: 1 })}</td><td>${res}</td></tr>`);
+    const dt = parseD(d);
+    rows.push(`<tr class="${d === t ? 'today' : ''}"><td>${n}</td><td><span class="dl">${longD(d)}</span><span class="ds">${dt.getMonth() + 1}.${dt.getDate()} (${WD[dt.getDay()]})</span></td><td class="muted hm">${usd(g0)}</td><td><b class="up">+${usd(g1 - g0)}</b><div class="mo">${krwShort(toKRW(g1 - g0, e))}</div></td><td class="hm">${krwShort(toKRW(g1 - g0, e))}</td><td><b>${usd(g1)}</b><div class="mo">${krwShort(toKRW(g1, e))}</div></td><td class="hm">${krwShort(toKRW(g1, e))}</td><td class="muted hm">×${(g1 / s.principal).toLocaleString('en-US', { maximumFractionDigits: 1 })}</td><td>${res}</td></tr>`);
   }
-  $('#guideTbl').innerHTML = `<table class="num"><thead><tr><th>일차</th><th>날짜</th><th>시작 잔고</th><th>목표 수익</th><th>목표 수익(원)</th><th>목표 잔고</th><th>목표 잔고(원)</th><th>원금 대비</th><th>실적</th></tr></thead><tbody>${rows.join('')}</tbody></table>`;
+  $('#guideTbl').innerHTML = `<table class="num"><thead><tr><th>일차</th><th>날짜</th><th class="hm">시작 잔고</th><th>목표 수익</th><th class="hm">목표 수익(원)</th><th>목표 잔고</th><th class="hm">목표 잔고(원)</th><th class="hm">원금 대비</th><th>실적</th></tr></thead><tbody>${rows.join('')}</tbody></table>`;
 }
 $('#guideBtn').onclick = () => { renderGuide(); guideDlg.showModal(); $('#guideTbl').scrollTop = 0; };
 $('#guideSeg').onclick = e => {
