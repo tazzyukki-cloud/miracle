@@ -90,7 +90,10 @@ dialog.wide .tblwrap{flex:1;min-height:0;max-height:none!important}
 dialog.wide table{font-size:13.5px}
 @media (max-height:700px){dialog.wide .dlg-b{overflow:auto}dialog.wide .tblwrap{flex:none;height:70vh}}
 .sumgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:16px 0}
-#guideTbl .ds,#guideTbl .mo{display:none}
+#guideTbl .ds,#guideTbl .mo,#wdTbl .ds,#wdTbl .mo,#wdTbl .mo-i{display:none}
+#wdTbl .mo{font-size:11.5px;color:var(--text-3);font-weight:400}
+#wdTbl .mo-i{color:var(--text-3);font-weight:400}
+@media (hover:none){.del{opacity:.55}}
 #guideTbl .mo{font-size:11.5px;color:var(--text-3);font-weight:400}
 @media (max-width:700px){
   .sumgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0 12px}
@@ -105,6 +108,15 @@ dialog.wide table{font-size:13.5px}
   #guideTbl .ds,#guideTbl .mo{display:block}
   #guideTbl table{font-size:13px}
   #guideTbl th,#guideTbl td{padding:7px 8px}
+  #wdTbl .hm,#wdTbl .dl{display:none}
+  #wdTbl .ds,#wdTbl .mo{display:block}
+  #wdTbl .mo-i{display:inline}
+  #wdTbl table{font-size:13px}
+  #wdTbl th,#wdTbl td{padding:8px 8px}
+  #wdTbl td.memo{white-space:normal;word-break:keep-all;min-width:70px}
+  #wdDlg .hint{font-size:11px;margin:6px 0 10px!important}
+  #wdDlg .wdform{margin-top:4px;gap:6px 8px}
+  #wdDlg .wdform label{font-size:11.5px}
 }
 .sum{background:var(--surface-2);border-radius:12px;padding:12px 14px;min-width:0}
 .sum .k{font-size:12px;color:var(--text-2)}
@@ -118,9 +130,9 @@ dialog.wide table{font-size:13.5px}
 .mile.done{border-color:var(--good);color:var(--good)}
 .ok{color:var(--good);font-weight:600}.ng{color:var(--warn);font-weight:600}
 .wdform{display:grid;grid-template-columns:140px 1fr 1fr 1.2fr auto;gap:8px;align-items:end;margin-top:14px}
-@media (max-width:760px){.wdform{grid-template-columns:1fr 1fr}}
+@media (max-width:760px){.wdform{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.wdform>div{grid-column:1/-1}.wdform>div .btn{flex:1}}
 .wdform label{font-size:12px;color:var(--text-2);display:flex;flex-direction:column;gap:4px}
-.wdform input{border:1px solid var(--border);border-radius:8px;padding:8px 10px;background:var(--surface);outline:0;min-width:0}
+.wdform input{border:1px solid var(--border);border-radius:8px;padding:8px 10px;background:var(--surface);outline:0;min-width:0;width:100%;box-sizing:border-box;height:38px}
 .wdform input:focus{border-color:var(--accent)}
 tr.editing td{background:var(--accent-soft)!important}
 
@@ -439,7 +451,7 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD = '20260930232051'; // 게시할 때 publish.sh가 시각으로 바꿈
+const BUILD = '20261014195100'; // 게시할 때 publish.sh가 시각으로 바꿈
 /* ---------- 유틸 ---------- */
 const $ = s => document.querySelector(s);
 const DAY = 86400000;
@@ -1034,10 +1046,10 @@ function renderWd() {
   const mh = 'style="background:var(--surface-2);font-weight:600"';
   let html = '';
   for (const [k, ws] of Object.entries(byMonth)) {
-    html += `<tr><td ${mh}>${k.replace('-', '.')}</td><td ${mh}>${ws.length}건</td><td ${mh}>${usd(sumBy(ws, w => w.usd))}</td><td ${mh}>${krw(sumBy(ws, w => w.krw))}</td><td ${mh}></td><td ${mh}></td><td ${mh}></td></tr>`;
-    html += ws.map(w => { const n = dayN(s, w.date); return `<tr class="rec ${wdEditing === w.id ? 'editing' : ''}" data-id="${w.id}"><td>${longD(w.date)}</td><td class="muted">${n >= 1 ? n + '일차' : ''}</td><td><b>${usd(w.usd)}</b></td><td>${krw(w.krw)}${w.est ? ' <span class="muted" title="입력 당시 환율·김프로 추정">추정</span>' : ''}</td><td style="text-align:left">${esc(w.note || '')}</td><td class="muted">${usd(cum.get(w.id))}</td><td class="act"><button class="del" data-wdel="${w.id}" title="삭제">×</button></td></tr>`; }).join('');
+    html += `<tr><td ${mh}>${k.replace('-', '.')} <span class="mo-i">· ${ws.length}건</span></td><td ${mh} class="hm">${ws.length}건</td><td ${mh}>${usd(sumBy(ws, w => w.usd))}<div class="mo">${krw(sumBy(ws, w => w.krw))}</div></td><td ${mh} class="hm">${krw(sumBy(ws, w => w.krw))}</td><td ${mh}></td><td ${mh} class="hm"></td><td ${mh}></td></tr>`;
+    html += ws.map(w => { const n = dayN(s, w.date); return `<tr class="rec ${wdEditing === w.id ? 'editing' : ''}" data-id="${w.id}"><td><span class="dl">${longD(w.date)}</span><span class="ds">${md(w.date)} (${WD[parseD(w.date).getDay()]})</span></td><td class="muted hm">${n >= 1 ? n + '일차' : ''}</td><td><b>${usd(w.usd)}</b><div class="mo">${krwShort(w.krw)}${w.est ? ' 추정' : ''}</div></td><td class="hm">${krw(w.krw)}${w.est ? ' <span class="muted" title="입력 당시 환율·김프로 추정">추정</span>' : ''}</td><td class="memo" style="text-align:left">${esc(w.note || '')}</td><td class="muted hm">${usd(cum.get(w.id))}</td><td class="act"><button class="del" data-wdel="${w.id}" title="삭제">×</button></td></tr>`; }).join('');
   }
-  $('#wdTbl').innerHTML = `<table class="num"><thead><tr><th>날짜</th><th>일차</th><th>출금액</th><th>원화</th><th style="text-align:left">메모</th><th>누적 출금</th><th></th></tr></thead><tbody>${html}</tbody></table>`;
+  $('#wdTbl').innerHTML = `<table class="num"><thead><tr><th>날짜</th><th class="hm">일차</th><th>출금액</th><th class="hm">원화</th><th style="text-align:left">메모</th><th class="hm">누적 출금</th><th></th></tr></thead><tbody>${html}</tbody></table>`;
 }
 function wdSave() {
   const s = S(), d = $('#wdDate').value, u = num($('#wdUsd').value), kIn = num($('#wdKrw').value), e = eff();
